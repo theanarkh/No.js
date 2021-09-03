@@ -1,3 +1,4 @@
+/***
 #include "signal.h"
 
 void signalHandler(int signum)
@@ -38,3 +39,4 @@ void No::Signal::Init(Isolate* isolate, Local<ObjectTemplate> target) {
   setMethod(isolate, signal, "kill", No::Signal::Kill);
   setTemplate(isolate, target, "signal", signal);
 }
+***/
