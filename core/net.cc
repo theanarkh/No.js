@@ -39,7 +39,7 @@ void No::Net::Connect(V8_ARGS) {
     // 申请内存
     struct connect_request *req = (struct connect_request *)malloc(sizeof(struct connect_request));
     // to do
-    memset(req, 0, sizeof(struct connect_request));
+    memset(req, 0, sizeof(*req));
     req->fd = fd;
     req->addr = (struct sockaddr *)&peer_addr_info;
     req->addrlen = sizeof(peer_addr_info);
@@ -60,22 +60,21 @@ void No::Net::Setsockopt(V8_ARGS) {
     
 }
 
-void No::Net::Close(V8_ARGS) {
-    V8_ISOLATE
-    int fd = args[0].As<Integer>()->Value(); 
-    int ret = close(fd);
-    V8_RETURN(Integer::New(isolate, ret));
-}
-
 void No::Net::Listen(V8_ARGS) {
     V8_ISOLATE
     int fd = args[0].As<Integer>()->Value(); 
     int backlog = args[0].As<Integer>()->Value(); 
     int ret = listen(fd, backlog);
+    if (ret == -1) {
+        V8_RETURN(Integer::New(isolate, ret));
+        return;
+    }
     struct tcp_request *req = (struct tcp_request *)malloc(sizeof(struct tcp_request));  
+     memset(req, 0, sizeof(*req));
     req->fd = fd;
     req->op = IORING_OP_ACCEPT;
     req->cb = makeCallback<onconnect>;
+    req->flag = IO_URING_REQUEST_AGAIN;
     V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(context);
      if (args.Length() > 2 && args[2]->IsFunction()) {
@@ -87,7 +86,7 @@ void No::Net::Listen(V8_ARGS) {
         req->data = (void *)new RequestContext(env, Local<Function>());
     }
     struct io_uring_info *io_uring_data = env->GetIOUringData();
-    SubmitRequest((struct request *)req,io_uring_data);
+    SubmitRequest((struct request *)req, io_uring_data);
     V8_RETURN(Integer::New(isolate, ret));
 }
 

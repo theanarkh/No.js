@@ -22,14 +22,24 @@ struct io_uring_info {
 
 typedef void (*request_cb)(void *);
 
+enum {
+    IO_URING_REQUEST_AGAIN = 1
+};
+
 #define REQUEST \
         int op; \
         request_cb cb; \
         int res;\
-        void * data;
+        void * data; \
+        int flag;
 
 struct request {
     REQUEST
+};
+
+struct close_request {
+    REQUEST
+    int fd;
 };
 
 struct io_request {
@@ -74,6 +84,8 @@ namespace No {
         void SubmitRequest(struct request * req, struct io_uring_info *io_uring_data);
         void Stop(struct io_uring_info *io_uring_data);
         void RunIOUring(struct io_uring_info *io_uring_data);
+        void incPending(struct io_uring_info *io_uring_data); 
+        void decPending(struct io_uring_info *io_uring_data); 
     }
 }
 

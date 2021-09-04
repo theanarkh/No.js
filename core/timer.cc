@@ -38,7 +38,7 @@ static u_int64_t timerHandler(V8_ARGS) {
         interval = args[2].As<Integer>()->Value(); 
     }
     timer_t * timerid = (timer_t *)malloc(sizeof(timer_t));  
-    memset(timerid, sizeof(timer_t), 0);
+    memset(timerid, 0, sizeof(*timerid));
     struct sigevent evp;  
     memset(&evp, 0, sizeof(struct sigevent));  
     evp.sigev_signo = SIGUSR2;  

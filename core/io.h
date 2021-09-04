@@ -27,7 +27,7 @@ namespace No {
         void Write(V8_ARGS);
         void ReadV(V8_ARGS);
         void WriteV(V8_ARGS);
-        void Inherit(Isolate* isolate, Local<ObjectTemplate> target);
+        void Close(V8_ARGS);
         void Init(Isolate* isolate, Local<Object> target);
     }
 }

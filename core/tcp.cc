@@ -6,7 +6,7 @@ void No::TCP::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, tcp, "accept", No::Net::Accept);
   setMethod(isolate, tcp, "socket", No::Net::Socket);
   setMethod(isolate, tcp, "bind", No::Net::Bind);
-  setMethod(isolate, tcp, "close", No::Net::Close);
+  setMethod(isolate, tcp, "close", No::IO::Close);
   setMethod(isolate, tcp, "connect", No::Net::Connect);
   setMethod(isolate, tcp, "setsockopt", No::Net::Setsockopt);
   setObjectValue(isolate, target, "tcp", tcp->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());

@@ -16,6 +16,7 @@ void read_write_request(V8_ARGS, int op) {
     bool isBatch = op == IORING_OP_READV || op == IORING_OP_WRITEV;
     if (isBatch) {
         struct io_batch_request *io_batch_req = (struct io_batch_request *)malloc(sizeof(struct io_batch_request) + (sizeof(struct iovec) * 1));
+         memset(io_batch_req, 0, sizeof(*io_batch_req));
         io_batch_req->nvecs = 1;
         io_batch_req->iovecs[0].iov_len = backing->ByteLength();
         io_batch_req->iovecs[0].iov_base = backing->Data();
@@ -24,6 +25,7 @@ void read_write_request(V8_ARGS, int op) {
         req = (struct request *)io_batch_req;
     } else {
         struct io_request *io_req = (struct io_request *)malloc(sizeof(struct io_request) + (sizeof(struct iovec) * 1));
+        memset(io_req, 0, sizeof(*io_req));
         io_req->buf = backing->Data();
         io_req->len = backing->ByteLength();
         io_req->fd = fd;
@@ -59,16 +61,36 @@ void No::IO::WriteV(V8_ARGS) {
     read_write_request(args, IORING_OP_WRITEV);
 }
 
-void No::IO::Inherit(Isolate* isolate, Local<ObjectTemplate> target) {
-  setMethod(isolate, target, "read", No::IO::Read);
-  setMethod(isolate, target, "write", No::IO::Write);
-  setMethod(isolate, target, "readv", No::IO::ReadV);
-  setMethod(isolate, target, "writev", No::IO::WriteV);
+
+void No::IO::Close(V8_ARGS) {
+    V8_ISOLATE
+    int fd = args[0].As<Integer>()->Value(); 
+    V8_CONTEXT
+    Environment *env = Environment::GetEnvByContext(context);
+    struct io_uring_info *io_uring_data = env->GetIOUringData();
+    struct close_request *req = (struct close_request *)malloc(sizeof(struct close_request));
+    memset(req, 0, sizeof(*req));
+    req->fd = fd;
+    req->cb = makeCallback<onclose>;
+    req->op = IORING_OP_CLOSE;
+    if (args.Length() > 1 && args[1]->IsFunction()) {
+        Local<Object> obj = Object::New(isolate);
+        Local<String> key = newStringToLcal(isolate, onclose);
+        obj->Set(context, key, args[1].As<Function>());
+	    req->data = (void *)new RequestContext(env, obj);
+    } else {
+        req->data = (void *)new RequestContext(env, Local<Function>());
+    }
+    SubmitRequest((struct request *)req, io_uring_data); 
 }
 
 void No::IO::Init(Isolate* isolate, Local<Object> target) {
   Local<ObjectTemplate> io = ObjectTemplate::New(isolate);
-  No::IO::Inherit(isolate, io);
+  setMethod(isolate, io, "read", No::IO::Read);
+  setMethod(isolate, io, "write", No::IO::Write);
+  setMethod(isolate, io, "readv", No::IO::ReadV);
+  setMethod(isolate, io, "writev", No::IO::WriteV);
+  setMethod(isolate, io, "close", No::IO::Close);
   setObjectValue(isolate, target, "io", io->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }
 

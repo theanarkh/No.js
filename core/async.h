@@ -3,11 +3,13 @@
 
 #include "util.h"
 #include "env.h"
+#include "io_uring.h"
 #include "include/common.h"
 
 using namespace v8;
 using namespace No::Util;
 using namespace No::Env;
+using namespace No::io_uring;
 
 namespace No {
     namespace Async {
@@ -28,8 +30,13 @@ namespace No {
                     cb.As<v8::Function>()->Call(context, object, 1, argv);
                 }
             }
-            delete ctx;
-            free(_req);
+            if (_req->flag & IO_URING_REQUEST_AGAIN) {
+                struct io_uring_info *io_uring_data = ctx->env->GetIOUringData();
+                SubmitRequest(_req, io_uring_data);
+            } else {
+                delete ctx;
+                free(_req);
+            }
         };
         template <const char * event>
         void makeCallback(RequestContext * ctx) {
