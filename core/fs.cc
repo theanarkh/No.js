@@ -28,11 +28,12 @@ void No::FS::OpenAt(V8_ARGS) {
   if (argc > 2) flags = Local<Integer>::Cast(args[2])->Value();
   mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
   if (argc > 3) mode = Local<Integer>::Cast(args[3])->Value();
-  V8_CONTEXT
+    V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(context);
     struct io_uring_info *io_uring_data = env->GetIOUringData();
     // 申请内存
     struct openat_file_request *req = (struct openat_file_request *)malloc(sizeof(struct openat_file_request) + (sizeof(struct iovec) * 1));
+    memset(req, 0, sizeof(*req));
     req->dirFd = dirFd; 
     req->path = *path;
     req->mode = mode;
@@ -52,7 +53,11 @@ void No::FS::Init(Isolate* isolate, Local<Object> target) {
   Local<ObjectTemplate> fs = ObjectTemplate::New(isolate);
   setMethod(isolate, fs, "open", No::FS::Open);
   setMethod(isolate, fs, "openat", No::FS::OpenAt);
-  No::IO::Inherit(isolate, fs);
+  setMethod(isolate, fs, "close", No::IO::Close);
+  setMethod(isolate, fs, "read", No::IO::Read);
+  setMethod(isolate, fs, "write", No::IO::Write);
+  setMethod(isolate, fs, "readv", No::IO::ReadV);
+  setMethod(isolate, fs, "writev", No::IO::WriteV);
   setObjectValue(isolate, target, "fs", fs->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }
 

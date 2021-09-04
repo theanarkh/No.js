@@ -54,7 +54,7 @@ void No::UDP::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, udp, "recvfrom", No::UDP::RecvFrom);
   setMethod(isolate, udp, "socket", No::Net::Socket);
   setMethod(isolate, udp, "bind", No::Net::Bind);
-  setMethod(isolate, udp, "close", No::Net::Close);
+  setMethod(isolate, udp, "close", No::IO::Close);
   setMethod(isolate, udp, "connect", No::Net::Connect);
   setMethod(isolate, udp, "setsockopt", No::Net::Setsockopt);
   setObjectValue(isolate, target, "udp", udp->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());

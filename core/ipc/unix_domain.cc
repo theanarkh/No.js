@@ -47,7 +47,7 @@ void No::UNIX_DOMAIN::Connect(V8_ARGS) {
     // 申请内存
     struct connect_request *req = (struct connect_request *)malloc(sizeof(struct connect_request));
     // to do
-    memset(req, 0, sizeof(struct connect_request));
+    memset(req, 0, sizeof(*req));
     req->fd = fd;
     req->addr = (struct sockaddr *)&peer_addr_info;
     req->addrlen = sizeof(peer_addr_info);
@@ -73,7 +73,7 @@ void No::UNIX_DOMAIN::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, unix_domain, "listen", No::Net::Listen);
   setMethod(isolate, unix_domain, "accept", No::Net::Accept);
   setMethod(isolate, unix_domain, "socket", No::Net::Socket);
-  setMethod(isolate, unix_domain, "close", No::Net::Close);
+  setMethod(isolate, unix_domain, "close", No::IO::Close);
   setMethod(isolate, unix_domain, "setsockopt", No::Net::Setsockopt);
   setObjectValue(isolate, target, "unix_domain", unix_domain->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }

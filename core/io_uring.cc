@@ -55,6 +55,12 @@ void No::io_uring::SubmitRequest(struct request * req, struct io_uring_info *io_
             io_uring_prep_connect(sqe, connect_req->fd, connect_req->addr, connect_req->addrlen);
                 break;
         }
+        case IORING_OP_CLOSE: 
+        {
+            struct close_request * close_req = (struct close_request *)req;
+            io_uring_prep_close(sqe, close_req->fd);
+            break;
+        }
        
         default:
             return;
@@ -63,6 +69,14 @@ void No::io_uring::SubmitRequest(struct request * req, struct io_uring_info *io_
     // 保存请求上下文，响应的时候用
     io_uring_sqe_set_data(sqe, (void *)req);
 	io_uring_submit(&io_uring_data->ring);
+}
+
+void incPending(struct io_uring_info *io_uring_data) {
+    ++io_uring_data->pending;
+}
+
+void decPending(struct io_uring_info *io_uring_data) {
+    --io_uring_data->pending;
 }
 
 void No::io_uring::RunIOUring(struct io_uring_info *io_uring_data) {

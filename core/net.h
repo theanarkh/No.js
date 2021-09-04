@@ -28,7 +28,6 @@ namespace No {
         void Bind(V8_ARGS);
         void Connect(V8_ARGS);
         void Setsockopt(V8_ARGS);
-        void Close(V8_ARGS);
         void Listen(V8_ARGS);
         void Accept(V8_ARGS);
         void connect_cb(void * req);
