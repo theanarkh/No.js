@@ -11,6 +11,8 @@
 #include "ipc/unix_domain.h"
 #include "console.h"
 #include "io_uring.h"
+#include "signal.h"
+#include "timer.h"
 
 using namespace v8;
 using namespace No;
