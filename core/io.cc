@@ -33,10 +33,10 @@ void read_write_request(V8_ARGS, int op) {
     req->cb = makeCallback<onread>;
     req->op = op;
     if (args.Length() > 3 && args[3]->IsFunction()) {
-        Local<Object> obj = args.This();
+        Local<Object> obj = Object::New(isolate);
         Local<String> key = newStringToLcal(isolate, onread);
         obj->Set(context, key, args[3].As<Function>());
-	    req->data = (void *)new RequestContext(env, args.This());
+	    req->data = (void *)new RequestContext(env, obj);
     } else {
         req->data = (void *)new RequestContext(env, Local<Function>());
     }

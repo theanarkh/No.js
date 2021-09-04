@@ -9,6 +9,8 @@ void No::Core::register_builtins(Isolate * isolate, Local<Object> target) {
     Net::Init(isolate, target);
     UDP::Init(isolate, target);
     UNIX_DOMAIN::Init(isolate, target);
+    Signal::Init(isolate, target);
+    Timer::Init(isolate, target);
 }
 
 void No::Core::Run(io_uring_info * io_uring_data) {

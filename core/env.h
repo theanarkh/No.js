@@ -42,10 +42,29 @@ namespace No {
                 if (!callback.IsEmpty()) {
                     callback.Reset();
                 }
+                printf("finish");
             }
             Environment * env;
             Global<Object> callback;
         };
+
+        struct SignalRequestContext: public RequestContext
+        {
+            SignalRequestContext(Environment * passEnv, Local<Object> _object, int _sig): 
+                RequestContext(passEnv, _object), sig(_sig) {}
+            int sig;
+        };
+
+        struct TimerRequestContext: public RequestContext
+        {
+            enum {
+                INTERVAL = 1
+            };
+            TimerRequestContext(Environment * passEnv, Local<Object> _object, int _flags): 
+                RequestContext(passEnv, _object), flags(_flags) {}
+            int flags;
+        };
+        
     }
 }
 

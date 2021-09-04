@@ -11,7 +11,7 @@
 // }
 
 #include "console.h"
-#include <stdio.h>
+
 void No::Console::log(V8_ARGS) {
     V8_ISOLATE
     String::Utf8Value str(isolate, args[0]);

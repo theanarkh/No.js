@@ -46,10 +46,10 @@ void No::Net::Connect(V8_ARGS) {
     req->op = IORING_OP_CONNECT;
     req->cb = makeCallback<onconnect>;
     if (args.Length() > 3 && args[3]->IsFunction()) {
-        Local<Object> obj = args.This();
+        Local<Object> obj = Object::New(isolate);
         Local<String> event = newStringToLcal(isolate, onconnect);
         obj->Set(context, event, args[3].As<Function>());
-	    req->data = (void *)new RequestContext(env, args.This());
+	    req->data = (void *)new RequestContext(env, obj);
     } else {
         req->data = (void *)new RequestContext(env, Local<Function>());
     }
@@ -79,10 +79,10 @@ void No::Net::Listen(V8_ARGS) {
     V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(context);
      if (args.Length() > 2 && args[2]->IsFunction()) {
-        Local<Object> obj = args.This();
+        Local<Object> obj = Object::New(isolate);
         Local<String> event = newStringToLcal(isolate, onconnect);
         obj->Set(context, event, args[2].As<Function>());
-	    req->data = (void *)new RequestContext(env, args.This());
+	    req->data = (void *)new RequestContext(env, obj);
     } else {
         req->data = (void *)new RequestContext(env, Local<Function>());
     }

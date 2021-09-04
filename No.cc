@@ -18,6 +18,8 @@ using namespace No::Core;
 using namespace No::Env;
 
 int main(int argc, char* argv[]) {
+  setvbuf(stdout, nullptr, _IONBF, 0);
+  setvbuf(stderr, nullptr, _IONBF, 0);
   v8::V8::InitializeICUDefaultLocation(argv[0]);
   v8::V8::InitializeExternalStartupData(argv[0]);
   std::unique_ptr<Platform> platform = platform::NewDefaultPlatform();

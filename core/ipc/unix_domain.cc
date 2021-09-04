@@ -54,10 +54,10 @@ void No::UNIX_DOMAIN::Connect(V8_ARGS) {
     req->op = IORING_OP_CONNECT;
     req->cb = makeCallback<onconnect>;
     if (args.Length() > 2 && args[2]->IsFunction()) {
-        Local<Object> obj = args.This();
+        Local<Object> obj = Object::New(isolate);
         Local<String> key = newStringToLcal(isolate, onconnect);
         obj->Set(context, key, args[2].As<Function>());
-	    req->data = (void *)new RequestContext(env, args.This());
+	    req->data = (void *)new RequestContext(env, obj);
     } else {
         req->data = (void *)new RequestContext(env, Local<Function>());
     }

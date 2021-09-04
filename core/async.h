@@ -31,6 +31,22 @@ namespace No {
             delete ctx;
             free(_req);
         };
+        template <const char * event>
+        void makeCallback(RequestContext * ctx) {
+            if (!ctx->callback.IsEmpty()) {
+                Local<Object> object = ctx->callback.Get(ctx->env->GetIsolate());
+                Local<Value> cb;
+                Local<Context> context = ctx->env->GetContext();
+                Local<String> onevent = newStringToLcal(ctx->env->GetIsolate(), event);       
+                object->Get(context, onevent).ToLocal(&cb);
+                if (cb->IsFunction()) {	
+                    Local<Value> argv[] = {
+                        Integer::New(context->GetIsolate(), 0)
+                    };
+                    cb.As<v8::Function>()->Call(context, object, 1, argv);
+                }
+            }
+        };
     }
 }
 
