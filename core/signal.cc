@@ -5,7 +5,7 @@ static void signalHandler(int signum)
 {   
     auto vec = signalMap.find(signum);
     if (vec != signalMap.end()) {
-        vector<shared_ptr<RequestContext>>::iterator it;
+        vector<shared_ptr<SignalRequestContext>>::iterator it;
         for(it=vec->second.begin();it!=vec->second.end(); it++)
         {
             makeCallback<onsignal>((*it).get());
@@ -20,14 +20,14 @@ void No::Signal::RegisterSignal(V8_ARGS) {
     Local<Object> obj = Object::New(isolate);
     Local<String> key = newStringToLcal(isolate, onsignal);
     obj->Set(context, key, args[1].As<Function>());
-    shared_ptr<RequestContext> ctx = make_shared<RequestContext>(env, obj);
     int sig = args[0].As<Integer>()->Value(); 
+    shared_ptr<SignalRequestContext> ctx = make_shared<SignalRequestContext>(env, obj, sig);
     auto ret = signalMap.find(sig);
     if (ret == signalMap.end()) {
         signal(sig, signalHandler);
-        vector<shared_ptr<RequestContext>> vec;
+        vector<shared_ptr<SignalRequestContext>> vec;
         vec.push_back(ctx);
-        signalMap.insert(map<int, vector<shared_ptr<RequestContext>>>::value_type (sig, vec));  
+        signalMap.insert(map<int, vector<shared_ptr<SignalRequestContext>>>::value_type (sig, vec));  
         return;
     }
     ret->second.push_back(ctx);

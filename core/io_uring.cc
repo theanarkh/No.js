@@ -71,11 +71,11 @@ void No::io_uring::SubmitRequest(struct request * req, struct io_uring_info *io_
 	io_uring_submit(&io_uring_data->ring);
 }
 
-void incPending(struct io_uring_info *io_uring_data) {
+void No::io_uring::incPending(struct io_uring_info *io_uring_data) {
     ++io_uring_data->pending;
 }
 
-void decPending(struct io_uring_info *io_uring_data) {
+void No::io_uring::decPending(struct io_uring_info *io_uring_data) {
     --io_uring_data->pending;
 }
 

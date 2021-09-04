@@ -8,6 +8,7 @@
 #include "util.h"
 
 using namespace v8;
+using namespace std;
 using namespace No::Util;
 
 namespace No {
@@ -37,15 +38,15 @@ namespace No {
 
         struct RequestContext {
             RequestContext(Environment * passEnv, Local<Object> _object)
-            : env(passEnv),  callback(env->GetIsolate(), _object) {}
+            : env(passEnv),  object(passEnv->GetIsolate(), _object) {}
             ~RequestContext() {
-                if (!callback.IsEmpty()) {
-                    callback.Reset();
+                if (!object.IsEmpty()) {
+                    object.Reset();
                 }
                 printf("finish");
             }
             Environment * env;
-            Global<Object> callback;
+            Global<Object> object;
         };
 
         struct SignalRequestContext: public RequestContext

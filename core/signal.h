@@ -17,7 +17,7 @@ using namespace No::Async;
 using namespace No::Env;
 using namespace std;
 
-static map<int, vector<shared_ptr<RequestContext>>> signalMap;
+static map<int, vector<shared_ptr<SignalRequestContext>>> signalMap;
 
 namespace No {
     namespace Signal {

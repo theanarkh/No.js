@@ -12,6 +12,7 @@ static void signalHandler(int sig, siginfo_t *si, void *uc)
         if (!(ctx->flags & TimerRequestContext::INTERVAL)) {
             timerMap.erase(*timer_id);
             free(timer_id);
+            decPending(ctx->env->GetIOUringData());
         }
     }
 }
@@ -46,7 +47,7 @@ static u_int64_t timerHandler(V8_ARGS) {
     evp.sigev_value.sival_ptr = timerid;  
     if (timer_create(CLOCK_REALTIME, &evp, timerid) == -1)  
     {  
-        perror("fail to timer_create");  
+        perror("timer_create fail");  
         return -1;
     }  
     int second = timeout / 1000;
@@ -60,9 +61,10 @@ static u_int64_t timerHandler(V8_ARGS) {
     it.it_value.tv_nsec = nsecond;  
     if (timer_settime(*timerid, 0, &it, 0) == -1)  
     {  
-        perror("fail to timer_settime");  
+        perror("timer_settimer fail");  
         return -1; 
     }  
+
     V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(context);
     Local<Object> obj = Object::New(isolate);
@@ -72,7 +74,8 @@ static u_int64_t timerHandler(V8_ARGS) {
     shared_ptr<TimerRequestContext> ctx = make_shared<TimerRequestContext>(env, obj, intervalFlags);
     auto ret = timerMap.find(*timerid);
     if (ret == timerMap.end()) {
-        timerMap.insert(map<timer_t, shared_ptr<TimerRequestContext>>::value_type (*timerid, ctx));  
+        timerMap.insert(map<timer_t, shared_ptr<TimerRequestContext>>::value_type (*timerid, ctx)); 
+        incPending(env->GetIOUringData());
     }
     return (u_int64_t)*timerid;
 }

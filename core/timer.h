@@ -10,12 +10,14 @@
 #include "env.h"
 #include "string.h"
 #include "async.h"
+#include "io_uring.h"
 
 using namespace v8;
 using namespace No::Util;
 using namespace No::Async;
 using namespace No::Env;
 using namespace std;
+using namespace No::io_uring;
 
 static map<timer_t, shared_ptr<TimerRequestContext>> timerMap;
 

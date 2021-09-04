@@ -17,8 +17,8 @@ namespace No {
         void makeCallback(void * req) {
             struct request * _req = (struct request *)req;
             RequestContext* ctx =(RequestContext *)_req->data;
-            if (!ctx->callback.IsEmpty()) {
-                Local<Object> object = ctx->callback.Get(ctx->env->GetIsolate());
+            if (!ctx->object.IsEmpty()) {
+                Local<Object> object = ctx->object.Get(ctx->env->GetIsolate());
                 Local<Value> cb;
                 Local<Context> context = ctx->env->GetContext();
                 Local<String> onevent = newStringToLcal(ctx->env->GetIsolate(), event);       
@@ -40,8 +40,8 @@ namespace No {
         };
         template <const char * event>
         void makeCallback(RequestContext * ctx) {
-            if (!ctx->callback.IsEmpty()) {
-                Local<Object> object = ctx->callback.Get(ctx->env->GetIsolate());
+            if (!ctx->object.IsEmpty()) {
+                Local<Object> object = ctx->object.Get(ctx->env->GetIsolate());
                 Local<Value> cb;
                 Local<Context> context = ctx->env->GetContext();
                 Local<String> onevent = newStringToLcal(ctx->env->GetIsolate(), event);       

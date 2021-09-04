@@ -14,7 +14,4 @@ const id3 = timer.setTimeout(() => {
     console.log("timeout 7s")
 },7000);
 // console.log(id1, id2);
-timer.clearTimeout(id2);
-while(1) {
-
-}   
+// timer.clearTimeout(id2);
