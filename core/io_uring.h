@@ -79,6 +79,14 @@ struct connect_request {
 	socklen_t addrlen;
 };
 
+struct timer_request {
+    REQUEST
+};
+
+struct signal_request {
+    REQUEST
+};
+
 namespace No {
     namespace io_uring {
         void SubmitRequest(struct request * req, struct io_uring_info *io_uring_data);

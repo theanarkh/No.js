@@ -1,6 +1,14 @@
 
 #include "signal.h"
 
+void signal_cb(void * req) {
+    // to do: the SignalRequestContext object may be release before here
+    struct signal_request * signal_req = (struct signal_request *)req; 
+    SignalRequestContext * ctx = (SignalRequestContext *)signal_req->data;
+    makeCallback<onsignal>(ctx);
+    free(signal_req);
+}
+
 static void signalHandler(int signum)
 {   
     auto vec = signalMap.find(signum);
@@ -8,7 +16,12 @@ static void signalHandler(int signum)
         vector<shared_ptr<SignalRequestContext>>::iterator it;
         for(it=vec->second.begin();it!=vec->second.end(); it++)
         {
-            makeCallback<onsignal>((*it).get());
+            struct signal_request * req = (struct signal_request *)malloc(sizeof(*req)); 
+            memset(req, 0, sizeof(*req));
+            req->cb = signal_cb;
+            req->data = (void *)(*it).get();
+            req->op = IORING_OP_NOP;
+            SubmitRequest((struct request *)req, (*it).get()->env->GetIOUringData());
         }
     }
 }

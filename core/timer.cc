@@ -1,19 +1,35 @@
 
 #include "timer.h"
 
-static void signalHandler(int sig, siginfo_t *si, void *uc)
+static void timer_cb(void *req)
 {   
-    timer_t *timer_id = (timer_t *)si->si_value.sival_ptr;
+    struct timer_request * timer_req = (struct timer_request *)req;;
+    timer_t timer_id = (timer_t)timer_req->data;
     // int or = timer_getoverrun(*tidp);
-    auto obj = timerMap.find(*timer_id);
+    auto obj = timerMap.find(timer_id);
     if (obj != timerMap.end()) {
         shared_ptr<TimerRequestContext> ctx = obj->second;
         makeCallback<ontimeout>(ctx.get());
         if (!(ctx->flags & TimerRequestContext::INTERVAL)) {
-            timerMap.erase(*timer_id);
-            free(timer_id);
+            timerMap.erase(timer_id);
             decPending(ctx->env->GetIOUringData());
         }
+    }
+    free(timer_req);
+}
+
+static void signalHandler(int sig, siginfo_t *si, void *uc)
+{   
+    TimerRequestContext *ctx = (TimerRequestContext *)si->si_value.sival_ptr;
+    // int or = timer_getoverrun(*tidp);
+    auto obj = timerMap.find(ctx->timer_id);
+    if (obj != timerMap.end()) {
+        struct timer_request * req = (struct timer_request *)malloc(sizeof(*req)); 
+        memset(req, 0, sizeof(*req));
+        req->cb = timer_cb;
+        req->data = (void *)ctx->timer_id;
+        req->op = IORING_OP_NOP;
+        SubmitRequest((struct request *)req, ctx->env->GetIOUringData());
     }
 }
 
@@ -38,18 +54,7 @@ static u_int64_t timerHandler(V8_ARGS) {
     if (args.Length() > 2) {
         interval = args[2].As<Integer>()->Value(); 
     }
-    timer_t * timerid = (timer_t *)malloc(sizeof(timer_t));  
-    memset(timerid, 0, sizeof(*timerid));
-    struct sigevent evp;  
-    memset(&evp, 0, sizeof(struct sigevent));  
-    evp.sigev_signo = SIGUSR2;  
-    evp.sigev_notify = SIGEV_SIGNAL;  
-    evp.sigev_value.sival_ptr = timerid;  
-    if (timer_create(CLOCK_REALTIME, &evp, timerid) == -1)  
-    {  
-        perror("timer_create fail");  
-        return -1;
-    }  
+    
     int second = timeout / 1000;
     int nsecond = (timeout % 1000) * 1000 * 1000;
     int interval_second = interval / 1000;
@@ -59,11 +64,6 @@ static u_int64_t timerHandler(V8_ARGS) {
     it.it_interval.tv_nsec = interval_nsecond;  
     it.it_value.tv_sec = second;  
     it.it_value.tv_nsec = nsecond;  
-    if (timer_settime(*timerid, 0, &it, 0) == -1)  
-    {  
-        perror("timer_settimer fail");  
-        return -1; 
-    }  
 
     V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(context);
@@ -71,13 +71,27 @@ static u_int64_t timerHandler(V8_ARGS) {
     Local<String> key = newStringToLcal(isolate, ontimeout);
     obj->Set(context, key, args[0].As<Function>());
     int intervalFlags = interval_second || interval_nsecond ? TimerRequestContext::INTERVAL : 0;
-    shared_ptr<TimerRequestContext> ctx = make_shared<TimerRequestContext>(env, obj, intervalFlags);
-    auto ret = timerMap.find(*timerid);
-    if (ret == timerMap.end()) {
-        timerMap.insert(map<timer_t, shared_ptr<TimerRequestContext>>::value_type (*timerid, ctx)); 
-        incPending(env->GetIOUringData());
-    }
-    return (u_int64_t)*timerid;
+    shared_ptr<TimerRequestContext> ctx = make_shared<TimerRequestContext>(env, obj, intervalFlags, (timer_t)-1);
+    struct sigevent evp;  
+    memset(&evp, 0, sizeof(struct sigevent));  
+    evp.sigev_signo = SIGUSR2;  
+    evp.sigev_notify = SIGEV_SIGNAL;  
+    evp.sigev_value.sival_ptr = (void *)ctx.get();  
+    if (timer_create(CLOCK_REALTIME, &evp, &(*ctx).timer_id) == -1)  
+    {  
+        perror("timer_create fail");  
+        return -1;
+    }  
+    
+    if (timer_settime((*ctx).timer_id, 0, &it, 0) == -1)  
+    {  
+        perror("timer_settimer fail");  
+        return -1; 
+    }  
+    
+    timerMap.insert(map<timer_t, shared_ptr<TimerRequestContext>>::value_type ((*ctx).timer_id, ctx)); 
+    incPending(env->GetIOUringData());
+    return (u_int64_t)(*ctx).timer_id;
 }
 
 void No::Timer::SetTimeout(V8_ARGS) {
@@ -90,16 +104,21 @@ void No::Timer::SetInterval(V8_ARGS) {
     V8_RETURN(BigInt::New(isolate, (u_int64_t)timerHandler(args)))
 }
 
-void No::Timer::ClearTimeout(V8_ARGS) {
+void clearTimer(V8_ARGS) {
     timer_t id = (timer_t)(args[0].As<BigInt>()->Uint64Value());
     timerMap.erase(id);
     timer_delete(id);
+    V8_CONTEXT
+    Environment *env = Environment::GetEnvByContext(context);
+    decPending(env->GetIOUringData());
+}
+
+void No::Timer::ClearTimeout(V8_ARGS) {
+    clearTimer(args);
 }
 
 void No::Timer::ClearInterval(V8_ARGS) {
-    timer_t id = (timer_t)(args[0].As<BigInt>()->Uint64Value());
-    timerMap.erase(id);
-    timer_delete(id);
+    clearTimer(args);
 }
 
 void No::Timer::Init(Isolate* isolate, Local<Object> target) {

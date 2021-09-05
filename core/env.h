@@ -61,9 +61,10 @@ namespace No {
             enum {
                 INTERVAL = 1
             };
-            TimerRequestContext(Environment * passEnv, Local<Object> _object, int _flags): 
-                RequestContext(passEnv, _object), flags(_flags) {}
+            TimerRequestContext(Environment * passEnv, Local<Object> _object, int _flags, timer_t _timer_id): 
+                RequestContext(passEnv, _object), flags(_flags), timer_id(_timer_id) {}
             int flags;
+            timer_t timer_id;
         };
         
     }

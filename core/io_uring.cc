@@ -61,6 +61,12 @@ void No::io_uring::SubmitRequest(struct request * req, struct io_uring_info *io_
             io_uring_prep_close(sqe, close_req->fd);
             break;
         }
+        case IORING_OP_NOP: 
+        {
+
+            io_uring_prep_nop(sqe);
+            break;
+        }
        
         default:
             return;

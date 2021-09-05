@@ -21,6 +21,11 @@ using namespace No::io_uring;
 
 static map<timer_t, shared_ptr<TimerRequestContext>> timerMap;
 
+struct timer_signal_context {
+    timer_t timer_id;
+    Environment * env;
+};
+
 namespace No {
     namespace Timer {
         void SetTimeout(V8_ARGS);
