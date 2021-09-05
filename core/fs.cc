@@ -48,6 +48,71 @@ void No::FS::OpenAt(V8_ARGS) {
     SubmitRequest((struct request *)req, io_uring_data); 
 }
 
+void No::FS::Dup(V8_ARGS) { 
+  V8_ISOLATE 
+  int fd = args[0].As<Integer>()->Value();
+  V8_RETURN(Integer::New(isolate, dup(fd)));
+}
+
+void No::FS::Dup2(V8_ARGS) { 
+  V8_ISOLATE 
+  int fd1 = args[0].As<Integer>()->Value();
+  int fd2 = args[1].As<Integer>()->Value();
+  V8_RETURN(Integer::New(isolate, dup2(fd1, fd2)));
+}
+
+static void InitConstant(Isolate* isolate, Local<ObjectTemplate> target) {
+  
+  Local<ObjectTemplate> constant = ObjectTemplate::New(isolate);
+  Local<ObjectTemplate> mode = ObjectTemplate::New(isolate);
+  Local<ObjectTemplate> flag = ObjectTemplate::New(isolate);
+
+  #define MODE_LIST(Set) \
+    Set(S_ISUID) \
+    Set(S_ISGID) \
+    Set(S_ISVTX) \
+    Set(S_IRUSR) \
+    Set(S_IWUSR) \
+    Set(S_IXUSR) \
+    Set(S_IRGRP) \
+    Set(S_IWGRP) \
+    Set(S_IXGRP) \
+    Set(S_IROTH) \
+    Set(S_IWOTH) \
+    Set(S_IXOTH) 
+    #define Set(val) setObjectTemplateValue(isolate, mode, #val, Number::New(isolate, val));
+        MODE_LIST(Set)
+    #undef Set
+  #undef MODE_LIST
+
+   #define FLAG_LIST(Set) \
+    Set(O_APPEND) \
+    Set(O_ASYNC) \
+    Set(O_CLOEXEC) \
+    Set(O_CREAT) \
+    Set(O_DIRECT) \
+    Set(O_DIRECTORY) \
+    Set(O_DSYNC) \
+    Set(O_EXCL) \
+    Set(O_LARGEFILE) \
+    Set(O_NOATIME) \
+    Set(O_NOCTTY) \
+    Set(O_NOFOLLOW) \
+    Set(O_NONBLOCK) \
+    Set(O_NDELAY)  \
+    Set(O_PATH) \
+    Set(O_SYNC) \
+    Set(O_TMPFILE)  \
+    Set(O_TRUNC) 
+    #define Set(val) setObjectTemplateValue(isolate, flag, #val, Number::New(isolate, val));
+        FLAG_LIST(Set)
+    #undef Set
+  #undef FLAG_LIST
+
+  setObjectTemplateValue(isolate, constant, "MODE", mode);
+  setObjectTemplateValue(isolate, constant, "FLAG", flag);
+  setObjectTemplateValue(isolate, target, "constant", constant);
+}
 void No::FS::Init(Isolate* isolate, Local<Object> target) {
   Local<ObjectTemplate> fs = ObjectTemplate::New(isolate);
   setMethod(isolate, fs, "open", No::FS::Open);
@@ -57,6 +122,9 @@ void No::FS::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, fs, "write", No::IO::Write);
   setMethod(isolate, fs, "readv", No::IO::ReadV);
   setMethod(isolate, fs, "writev", No::IO::WriteV);
+  setMethod(isolate, fs, "dup", No::FS::Dup);
+  setMethod(isolate, fs, "dup2", No::FS::Dup2);
+  InitConstant(isolate, fs);
   setObjectValue(isolate, target, "fs", fs->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }
 
