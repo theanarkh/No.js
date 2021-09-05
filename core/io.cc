@@ -24,7 +24,7 @@ void read_write_request(V8_ARGS, int op) {
         io_batch_req->offset = offset;
         req = (struct request *)io_batch_req;
     } else {
-        struct io_request *io_req = (struct io_request *)malloc(sizeof(struct io_request) + (sizeof(struct iovec) * 1));
+        struct io_request *io_req = (struct io_request *)malloc(sizeof(*io_req));
         memset(io_req, 0, sizeof(*io_req));
         io_req->buf = backing->Data();
         io_req->len = backing->ByteLength();
