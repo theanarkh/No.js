@@ -1,5 +1,4 @@
 #include "fs.h"
-#include <stdio.h>
 
 void No::FS::Open(V8_ARGS) {
   V8_ISOLATE

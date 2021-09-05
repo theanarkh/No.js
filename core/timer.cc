@@ -42,7 +42,7 @@ static void initTimer() {
     sigemptyset(&act.sa_mask);  
 
     if (sigaction(SIGUSR2, &act, NULL) == -1) {
-        perror("fail to sigaction");
+        printf("fail to sigaction");
         return;
     }
 }
@@ -79,13 +79,13 @@ static u_int64_t timerHandler(V8_ARGS) {
     evp.sigev_value.sival_ptr = (void *)ctx.get();  
     if (timer_create(CLOCK_REALTIME, &evp, &(*ctx).timer_id) == -1)  
     {  
-        perror("timer_create fail");  
+        printf("timer_create fail");  
         return -1;
     }  
     
     if (timer_settime((*ctx).timer_id, 0, &it, 0) == -1)  
     {  
-        perror("timer_settimer fail");  
+        printf("timer_settimer fail");  
         return -1; 
     }  
     
