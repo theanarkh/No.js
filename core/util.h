@@ -38,6 +38,7 @@ namespace No {
             private:
                 uint64_t id;
         }
+        IdGenerator globalIdGenerator;
     }
 }
 

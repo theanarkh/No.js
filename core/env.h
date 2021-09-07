@@ -75,8 +75,9 @@ namespace No {
         };
         struct InotifyRequestContext: public RequestContext
         {
-            InotifyRequestContext(Environment * passEnv, Local<Object> _object): 
-                RequestContext(passEnv, _object){}
+            InotifyRequestContext(Environment * passEnv, Local<Object> _object, int _id): 
+                RequestContext(passEnv, _object), id(_id){}
+            int id;
         };
     }
 }

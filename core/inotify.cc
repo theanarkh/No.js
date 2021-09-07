@@ -14,31 +14,44 @@ void No::Inotify::On(Isolate* isolate, Local<Object> target) {
     Local<Object> obj = Object::New(isolate);
     Local<String> key = newStringToLcal(isolate, onchange);
     obj->Set(context, key,  args[2].As<Function>());
-    
-    auto vec = inotifyMap.find(inotifyInfo);
-    shared_ptr ctx = make_shared<InotifyRequestContext>(env, obj);
+    auto vec = inotifyMap.find(id);
+    int funcId = globalIdGenerator.getNextId();
+    shared_ptr ctx = make_shared<InotifyRequestContext>(env, obj, funcId);
     if (vec == inotifyMap.end()) {
-        InotifyInfo inotifyInfo(*path, id);
         vector<shared_ptr<InotifyRequestContext> v;
         v.push_back(ctx);
-        inotifyMap.insert(map<InotifyInfo,  vector<shared_ptr<InotifyRequestContext>>::value_type(inotifyInfo, v));
+        inotifyMap.insert(map<int,  vector<shared_ptr<InotifyRequestContext>>::value_type(id, v));
+    } else {
+        vec->second.push_back(ctx);
     }
-    vec->second.push_back(ctx);
-    V8_RETURN(Integer::New(isolate, 0));
+    Local<Object> obj = Object::New(isolate);
+    obj->Set(context, newStringToLcal(isolate, "watchId"),Number::New(isolate, id));
+    obj->Set(context, newStringToLcal(isolate, "funcId"),Number::New(isolate, funcId));
+    V8_RETURN(obj);
 }
 
 void No::Inotify::Off(Isolate* isolate, Local<Object> target) {
     V8_ISOLATE
+    V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(isolate->GetCurrentContext());
-    String::Utf8Value path(isolate, args[0]);
-    inotifyMap.erase(id);
-    auto listener = inotifyMap.find(*path);
-    if (listener != inotifyMap.end()) {
-        listener->second;
-        int wd = args[0].As<Integer>()->Value();
-        int id = inotify_rm_watch(env->getInotifyFd(), wd);
-        if (id == -1) {
-            V8_RETURN(Integer::New(isolate, id));
+    Local<Object> obj = args[0].As<Object>();
+    Local<Number> watchId = obj->Get(context, "watchId");
+    Local<Number> funcId = obj->Get(context, "funcId");
+    
+    auto listeners = inotifyMap.find(watchId);
+    vector<shared_ptr<InotifyRequestContext>>::iterator it;
+    for(it=listeners->second.begin();it!=listeners->second.end(); it++)
+    {
+        if ((*it).id == funcId) {
+            listeners.erase(it);
+            break;
+        }
+    }
+    if (listeners.size() == 0) {
+        inotifyMap.erase(watchId);
+        int ret = inotify_rm_watch(env->getInotifyFd(), watchId);
+        if (ret == -1) {
+            V8_RETURN(Integer::New(isolate, ret));
             return;
         }
     }
