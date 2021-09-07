@@ -7,11 +7,16 @@
 #include "util.h"
 #include "env.h"
 #include "string.h"
+#include "io_uring.h"
+#include "async.h"
 
 using namespace No::Util;
-using namespace No::Env
+using namespace No::Env;
+using namespace No::io_uring;
+using namespace No::Async;
 using namespace std;
 
+static bool needSubmit = true;
 static map<int, vector<shared_ptr<InotifyRequestContext>> inotifyMap;
 
 namespace No {

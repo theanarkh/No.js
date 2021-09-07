@@ -1,5 +1,20 @@
 #include "inotify.h"
 
+void SubmitReadRequest() {
+    if (needSubmit) {
+        struct io_request * inotify_req = (struct io_request *)malloc(sizeof(*inotify_req));
+        memset(inotify_req, 0, sizeof(*inotify_req));
+        int size = 4096;
+        char * buf = (char *)malloc(size);
+        inotify_req->cb = inotifyHandler;
+        inotify_req->fd = env->getInotifyFd();
+        inotify_req->op = IORING_OP_READ;
+        inotify_req->buf = buf;
+        inotify_req->len = size;
+        SubmitRequest((struct io_request *)inotify_req, env->GetIOUringData());
+        needSubmit = false;
+    }
+}
 void No::Inotify::On(Isolate* isolate, Local<Object> target) {
     V8_ISOLATE
     V8_CONTEXT
@@ -14,6 +29,7 @@ void No::Inotify::On(Isolate* isolate, Local<Object> target) {
         V8_RETURN(Integer::New(isolate, id));
         return;
     }
+    SubmitReadRequest();
     Local<Object> obj = Object::New(isolate);
     Local<String> key = newStringToLcal(isolate, onchange);
     obj->Set(context, key,  args[1].As<Function>());
@@ -68,6 +84,36 @@ void No::Inotify::Off(Isolate* isolate, Local<Object> target) {
         ret = inotify_rm_watch(env->getInotifyFd(), watchId);
     }
     V8_RETURN(Integer::New(isolate, ret));
+}
+
+void inotifyHandler(void * req) {
+    struct io_request * inotify_req = (struct io_request * )req;
+    char * buf = inotify_req->buf;
+    char * size = inotify_req->res;
+    char *p;
+    struct inotify_event * e;
+    int events;
+
+    for (p = buf; p < buf + size; p += sizeof(*e) + e->len) {
+      e = (const struct inotify_event*)p;
+
+      events = 0;
+      if (e->mask & (IN_ATTRIB|IN_MODIFY))
+        events |= CHANGE;
+      if (e->mask & ~(IN_ATTRIB|IN_MODIFY))
+        events |= RENAME;
+    
+        auto listeners = inotifyMap.find(e->wd);
+        bool haveListener = listeners != inotifyMap.end();
+        if (!haveListener) {
+            continue;
+        }
+        vector<shared_ptr<InotifyRequestContext>>::iterator it;
+        for(it=listeners->second.begin();it!=listeners->second.end(); it++)
+        {
+            makeCallback(*(*it));
+        }
+    }
 }
 
 void No::Inotify::Init(Isolate* isolate, Local<Object> target) {
