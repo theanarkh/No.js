@@ -42,5 +42,4 @@ function unwatch(filename, callback) {
             return;
         }
     }
-
 }
