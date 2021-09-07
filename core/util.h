@@ -23,6 +23,21 @@ namespace No {
 //                template <class TypeName>
                 static Local<Context> Strong(const PersistentBase<Context>& persistent);
         };
+        template <typename T>
+        struct KeyCompare {
+            bool operator()(T* x, T* k) const {
+                return x->id >= k->id;
+            }
+        };
+        class IdGenerator {
+            public:
+                IdGenerator(uint64_t _id = 0): id(_id) {}
+                getNextId() {
+                    return ++id;
+                }
+            private:
+                uint64_t id;
+        }
     }
 }
 

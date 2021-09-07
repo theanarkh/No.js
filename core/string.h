@@ -6,5 +6,6 @@ const char onread[] = "onread";
 const char onsignal[] = "onsignal";
 const char ontimeout[] = "ontimeout";
 const char onclose[] = "onclose";
+const char onchange[] = "onchange";
 
 #endif

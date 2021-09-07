@@ -27,13 +27,20 @@ namespace No {
                 Isolate * GetIsolate() const {
                     return _isolate;
                 }
-                 Local<Context> GetContext() const {
+                Local<Context> GetContext() const {
                     return PersistentToLocal::Strong(_context);
+                }
+                setInotifyFd(int fd) {
+                    inotify_fd = fd;
+                }
+                getInotifyFd() {
+                    return inotify_fd;
                 }
             private:
                 struct io_uring_info *io_uring_data;
                 Global<Context> _context;
                 Isolate * _isolate;
+                int inotify_fd;
         };
 
         struct RequestContext {
@@ -66,7 +73,11 @@ namespace No {
             int flags;
             timer_t timer_id;
         };
-        
+        struct InotifyRequestContext: public RequestContext
+        {
+            InotifyRequestContext(Environment * passEnv, Local<Object> _object): 
+                RequestContext(passEnv, _object){}
+        };
     }
 }
 
