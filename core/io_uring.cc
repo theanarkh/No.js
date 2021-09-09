@@ -97,7 +97,7 @@ void No::io_uring::RunIOUring(struct io_uring_info *io_uring_data) {
             io_uring_peek_cqe(ring, &cqe);
             if (cqe == NULL)
                 break;
-            // --io_uring_data->pending;
+            --io_uring_data->pending;
             // 拿到请求上下文
             req = (struct request*) (uintptr_t) cqe->user_data;
             req->res = cqe->res;
