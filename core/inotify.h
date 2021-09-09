@@ -4,6 +4,8 @@
 #include <sys/inotify.h>
 #include "include/common.h"
 #include <vector>
+#include <map>
+#include <memory>
 #include "util.h"
 #include "env.h"
 #include "string.h"
@@ -16,8 +18,9 @@ using namespace No::io_uring;
 using namespace No::Async;
 using namespace std;
 
+static IdGenerator globalIdGenerator;
 static bool needSubmit = true;
-static map<int, vector<shared_ptr<InotifyRequestContext>> inotifyMap;
+static map<int, vector<shared_ptr<InotifyRequestContext>>> inotifyMap;
 
 namespace No {
     namespace Inotify {

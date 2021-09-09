@@ -2,7 +2,10 @@
 #define FS_H
 
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include <unistd.h>
+#include <libgen.h>
 #include "util.h"
 #include "include/common.h"
 #include "io_uring.h"
@@ -18,6 +21,8 @@ namespace No {
     namespace FS {
         void Open(V8_ARGS);
         void OpenAt(V8_ARGS);
+        void Dup(V8_ARGS);
+        void Dup2(V8_ARGS);
         void Init(Isolate* isolate, Local<Object> target);
     }
 }

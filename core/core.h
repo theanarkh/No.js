@@ -13,6 +13,7 @@
 #include "io_uring.h"
 #include "signal.h"
 #include "timer.h"
+#include "inotify.h"
 
 using namespace v8;
 using namespace No;

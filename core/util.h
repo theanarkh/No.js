@@ -29,16 +29,16 @@ namespace No {
                 return x->id >= k->id;
             }
         };
+
         class IdGenerator {
             public:
                 IdGenerator(uint64_t _id = 0): id(_id) {}
-                getNextId() {
+                uint64_t getNextId() {
                     return ++id;
                 }
             private:
                 uint64_t id;
-        }
-        IdGenerator globalIdGenerator;
+        };
     }
 }
 

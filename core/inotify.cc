@@ -1,6 +1,42 @@
 #include "inotify.h"
 
-void SubmitReadRequest() {
+void SubmitReadRequest(Environment *env);
+
+void inotifyHandler(void * req) {
+
+    struct io_request * inotify_req = (struct io_request * )req;
+    char * buf = (char *)inotify_req->buf;
+    char size = inotify_req->res;
+    char *p;
+    struct inotify_event * e;
+    int events;
+
+    for (p = buf; p < buf + size; p += sizeof(*e) + e->len) {
+      e = (struct inotify_event*)p;
+
+      events = 0;
+      if (e->mask & (IN_ATTRIB|IN_MODIFY))
+        events |= 1;
+      if (e->mask & ~(IN_ATTRIB|IN_MODIFY))
+        events |= 2;
+        auto listeners = inotifyMap.find(e->wd);
+        bool haveListener = listeners != inotifyMap.end();
+        if (!haveListener) {
+            continue;
+        }
+        SubmitReadRequest((Environment *)inotify_req->data);
+        printf("%d", listeners->second.size());
+        vector<shared_ptr<InotifyRequestContext>>::iterator it;
+        for(it=listeners->second.begin();it!=listeners->second.end(); it++)
+        {
+            makeCallback<onchange>((*it).get());
+        }
+        needSubmit = true;
+        
+    }
+}
+
+void SubmitReadRequest(Environment *env) {
     if (needSubmit) {
         struct io_request * inotify_req = (struct io_request *)malloc(sizeof(*inotify_req));
         memset(inotify_req, 0, sizeof(*inotify_req));
@@ -11,11 +47,12 @@ void SubmitReadRequest() {
         inotify_req->op = IORING_OP_READ;
         inotify_req->buf = buf;
         inotify_req->len = size;
-        SubmitRequest((struct io_request *)inotify_req, env->GetIOUringData());
+        inotify_req->data = (void *)env;
+        SubmitRequest((struct request *)inotify_req, env->GetIOUringData());
         needSubmit = false;
     }
 }
-void No::Inotify::On(Isolate* isolate, Local<Object> target) {
+void No::Inotify::On(V8_ARGS) {
     V8_ISOLATE
     V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(context);
@@ -29,93 +66,64 @@ void No::Inotify::On(Isolate* isolate, Local<Object> target) {
         V8_RETURN(Integer::New(isolate, id));
         return;
     }
-    SubmitReadRequest();
+    SubmitReadRequest(env);
     Local<Object> obj = Object::New(isolate);
     Local<String> key = newStringToLcal(isolate, onchange);
     obj->Set(context, key,  args[1].As<Function>());
     auto vec = inotifyMap.find(id);
     int funcId = globalIdGenerator.getNextId();
-    shared_ptr ctx = make_shared<InotifyRequestContext>(env, obj, funcId);
+    shared_ptr<InotifyRequestContext> ctx = make_shared<InotifyRequestContext>(env, obj, funcId);
     if (vec == inotifyMap.end()) {
-        vector<shared_ptr<InotifyRequestContext> v;
+        vector<shared_ptr<InotifyRequestContext>> v;
         v.push_back(ctx);
-        inotifyMap.insert(map<int,  vector<shared_ptr<InotifyRequestContext>>::value_type(id, v));
+        inotifyMap.insert(map<int, vector<shared_ptr<InotifyRequestContext>>>::value_type(id, v));
     } else {
         vec->second.push_back(ctx);
     }
-    Local<Object> obj = Object::New(isolate);
-    obj->Set(context, newStringToLcal(isolate, "watchId"),Number::New(isolate, id));
-    obj->Set(context, newStringToLcal(isolate, "funcId"),Number::New(isolate, funcId));
-    V8_RETURN(obj);
+    Local<Object> ret = Object::New(isolate);
+    ret->Set(context, newStringToLcal(isolate, "watchId"),Number::New(isolate, id));
+    ret->Set(context, newStringToLcal(isolate, "funcId"),Number::New(isolate, funcId));
+    V8_RETURN(ret);
 }
 
-void No::Inotify::Off(Isolate* isolate, Local<Object> target) {
+void No::Inotify::Off(V8_ARGS) {
     V8_ISOLATE
     V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(isolate->GetCurrentContext());
     Local<Object> obj = args[0].As<Object>();
-    Local<Number> watchId = obj->Get(context, "watchId");
-    Local<Number> funcId = obj->Get(context, "funcId");
+    Local<Value> watchId;
+    obj->Get(context, newStringToLcal(isolate,"watchId")).ToLocal(&watchId);
+    Local<Value> funcId;
+    obj->Get(context, newStringToLcal(isolate, "funcId")).ToLocal(&funcId);
     if (!watchId->IsNumber()) {
         return;
     }
-    auto listeners = inotifyMap.find(watchId);
+    int id = watchId.As<Integer>()->Value();
+    auto listeners = inotifyMap.find(id);
     bool haveListener = listeners != inotifyMap.end();
     if (!haveListener) {
         return;
     }
     if (!funcId->IsNumber()) {
-        inotifyMap.erase(watchId);
-        int ret = inotify_rm_watch(env->getInotifyFd(), watchId);
+        inotifyMap.erase(id);
+        int ret = inotify_rm_watch(env->getInotifyFd(), id);
         V8_RETURN(Integer::New(isolate, ret));
         return;
     }
     vector<shared_ptr<InotifyRequestContext>>::iterator it;
     for(it=listeners->second.begin();it!=listeners->second.end(); it++)
     {
-        if ((*it).id == funcId) {
-            listeners.erase(it);
+        if ((*it)->id == funcId.As<Integer>()->Value()) {
+            listeners->second.erase(it);
             break;
         }
     }
     int ret = 0;
-    if (listeners.size() == 0) {
-        inotifyMap.erase(watchId);
-        ret = inotify_rm_watch(env->getInotifyFd(), watchId);
+    if (listeners->second.size() == 0) {
+        inotifyMap.erase(id);
+        ret = inotify_rm_watch(env->getInotifyFd(), id);
     }
     V8_RETURN(Integer::New(isolate, ret));
-}
-
-void inotifyHandler(void * req) {
-    struct io_request * inotify_req = (struct io_request * )req;
-    char * buf = inotify_req->buf;
-    char * size = inotify_req->res;
-    char *p;
-    struct inotify_event * e;
-    int events;
-
-    for (p = buf; p < buf + size; p += sizeof(*e) + e->len) {
-      e = (const struct inotify_event*)p;
-
-      events = 0;
-      if (e->mask & (IN_ATTRIB|IN_MODIFY))
-        events |= CHANGE;
-      if (e->mask & ~(IN_ATTRIB|IN_MODIFY))
-        events |= RENAME;
-    
-        auto listeners = inotifyMap.find(e->wd);
-        bool haveListener = listeners != inotifyMap.end();
-        if (!haveListener) {
-            continue;
-        }
-        vector<shared_ptr<InotifyRequestContext>>::iterator it;
-        for(it=listeners->second.begin();it!=listeners->second.end(); it++)
-        {
-            makeCallback(*(*it));
-        }
-        needSubmit = true;
-        SubmitReadRequest();
-    }
 }
 
 void No::Inotify::Init(Isolate* isolate, Local<Object> target) {

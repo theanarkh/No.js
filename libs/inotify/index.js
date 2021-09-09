@@ -43,3 +43,7 @@ function unwatch(filename, callback) {
         }
     }
 }
+
+watch('/home/cyb/code/No.js/hello.js', () => {
+    console.log(2)
+})

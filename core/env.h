@@ -30,10 +30,10 @@ namespace No {
                 Local<Context> GetContext() const {
                     return PersistentToLocal::Strong(_context);
                 }
-                setInotifyFd(int fd) {
+                void setInotifyFd(int fd) {
                     inotify_fd = fd;
                 }
-                getInotifyFd() {
+                int getInotifyFd() {
                     return inotify_fd;
                 }
             private:
