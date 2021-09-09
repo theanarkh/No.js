@@ -113,6 +113,8 @@ void inotifyHandler(void * req) {
         {
             makeCallback(*(*it));
         }
+        needSubmit = true;
+        SubmitReadRequest();
     }
 }
 
