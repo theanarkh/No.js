@@ -25,7 +25,6 @@ void inotifyHandler(void * req) {
             continue;
         }
         SubmitReadRequest((Environment *)inotify_req->data);
-        printf("%d", listeners->second.size());
         vector<shared_ptr<InotifyRequestContext>>::iterator it;
         for(it=listeners->second.begin();it!=listeners->second.end(); it++)
         {

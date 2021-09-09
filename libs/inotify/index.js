@@ -15,9 +15,9 @@ function watch(filename, cb, options) {
         const ctx = inotify.on(filename, () => {
             const { queue = [] } = map[filename];
             map[filename].queue = []
-            let cb;
-            while(cb == queue.shift()) {
-                cb();
+            let context;
+            while(context = queue.shift()) {
+                context.cb();
             }
         });
         map[filename] = {
