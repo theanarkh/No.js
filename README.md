@@ -9,7 +9,7 @@
 2 修改launch.json的args配置为你执行的文件  
 3 点击vscode左侧的小虫子开始调试  
 
-三 core dump排查
+三 core dump 排查
 1 sudo su  
 2 echo "/core/%e.core.%p" > /proc/sys/kernel/core_pattern  
 3 ulimit -c unlimited  
