@@ -14,10 +14,9 @@ function watch(filename, cb, options) {
     } else {
         const ctx = inotify.on(filename, () => {
             const { queue = [] } = map[filename];
-            map[filename].queue = []
-            let context;
-            while(context = queue.shift()) {
-                context.cb();
+            for (let i = 0; i < queue.length; i++) {
+                const { options, cb } = queue[i];
+                cb();
             }
         });
         map[filename] = {
@@ -31,19 +30,29 @@ function unwatch(filename, callback) {
     if (!map[filename]) {
         return;
     }
-    if (typeof cb !== "function") {
+    if (typeof callback !== "function") {
+        const { ctx } = map[filename];
         delete map[filename];
-        return;
-    }
-    const { queue = [] } = map[filename];
-    for (const [index, cb] of Object.entries(queue)) {
-        if (cb === callback) {
-            queue.splice(index, 1);
-            return;
+        return inotify.off(ctx);
+    } else {
+        const { queue = [], ctx } = map[filename];
+        for (let i = 0; i < queue.length; i++) {
+            const { cb } = queue[i];
+            if (cb === callback) {
+                queue.splice(i, 1);
+                break;
+            }
         }
+        if (!queue.length) {
+            return inotify.off(ctx);
+        }
+        return 0;
     }
+    
+    
 }
 
 watch('/home/cyb/code/No.js/hello.js', () => {
-    console.log(2)
+    console.log(2);
+    unwatch('/home/cyb/code/No.js/hello.js')
 })

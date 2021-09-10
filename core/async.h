@@ -40,7 +40,7 @@ namespace No {
         };
         template <const char * event>
         void makeCallback(RequestContext * ctx) {
-            if (!ctx->object.IsEmpty()) {
+            if (ctx != nullptr && !ctx->object.IsEmpty()) {
                 Local<Object> object = ctx->object.Get(ctx->env->GetIsolate());
                 Local<Value> cb;
                 Local<Context> context = ctx->env->GetContext();

@@ -45,7 +45,9 @@ namespace No {
 
         struct RequestContext {
             RequestContext(Environment * passEnv, Local<Object> _object)
-            : env(passEnv),  object(passEnv->GetIsolate(), _object) {}
+            : env(passEnv),  object(passEnv->GetIsolate(), _object) {
+                
+            }
             ~RequestContext() {
                 if (!object.IsEmpty()) {
                     object.Reset();
@@ -76,7 +78,9 @@ namespace No {
         struct InotifyRequestContext: public RequestContext
         {
             InotifyRequestContext(Environment * passEnv, Local<Object> _object, int _id): 
-                RequestContext(passEnv, _object), id(_id){}
+                RequestContext(passEnv, _object), id(_id){
+                    
+                }
             int id;
         };
     }

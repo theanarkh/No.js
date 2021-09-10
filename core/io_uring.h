@@ -23,7 +23,7 @@ struct io_uring_info {
 typedef void (*request_cb)(void *);
 
 enum {
-    IO_URING_REQUEST_AGAIN = 1
+    IO_URING_REQUEST_AGAIN = 1,
 };
 
 #define REQUEST \

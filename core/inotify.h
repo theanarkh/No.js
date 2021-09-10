@@ -21,6 +21,12 @@ using namespace std;
 static IdGenerator globalIdGenerator;
 static bool needSubmit = true;
 static map<int, vector<shared_ptr<InotifyRequestContext>>> inotifyMap;
+static int count = 0;
+
+enum EVENT {
+    CHANGE = 1,
+    RENAME = 2
+};
 
 namespace No {
     namespace Inotify {
