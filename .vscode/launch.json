@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/No",
-            "args": ["libs/inotify/index.js"],
+            "args": ["test/loader/index.js"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}/",
             "environment": [],

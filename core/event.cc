@@ -15,7 +15,7 @@
 //     if (vec != _map.end()) {
 //         vector<shared_ptr<VALUE>>::iterator it;
 //         for(it=vec->second.begin();it!=vec->second.end();)
-//         {
+//         {    
 //             if (*it.id == id) {
 //                 vec.erase(it);
 //             } else {
