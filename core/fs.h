@@ -6,6 +6,10 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <cstdlib>
+
 #include "util.h"
 #include "include/common.h"
 #include "io_uring.h"
@@ -20,6 +24,7 @@ using namespace No::io_uring;
 namespace No {
     namespace FS {
         void Open(V8_ARGS);
+        void Realpath(V8_ARGS);
         void OpenAt(V8_ARGS);
         void Dup(V8_ARGS);
         void Dup2(V8_ARGS);

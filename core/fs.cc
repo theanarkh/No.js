@@ -12,6 +12,18 @@ void No::FS::Open(V8_ARGS) {
   V8_RETURN(ret);
 }
 
+void No::FS::Realpath(V8_ARGS) {
+  V8_ISOLATE
+  String::Utf8Value filename(isolate, args[0]);
+  char resolved_path[PATH_MAX];
+  const char * path = realpath(*filename, resolved_path);
+  if (!path) {
+    return V8_RETURN(Null(isolate));
+  }
+  Local<String> pathObj = newStringToLcal(isolate, path);
+  V8_RETURN(pathObj);
+}
+
 void openAfter(void * req) {
     struct openat_file_request * file_req = (struct openat_file_request *)req;
     printf("%d", file_req->res);
@@ -116,6 +128,7 @@ static void InitConstant(Isolate* isolate, Local<ObjectTemplate> target) {
 void No::FS::Init(Isolate* isolate, Local<Object> target) {
   Local<ObjectTemplate> fs = ObjectTemplate::New(isolate);
   setMethod(isolate, fs, "open", No::FS::Open);
+  setMethod(isolate, fs, "realpath", No::FS::Realpath);
   setMethod(isolate, fs, "openat", No::FS::OpenAt);
   setMethod(isolate, fs, "close", No::IO::Close);
   setMethod(isolate, fs, "read", No::IO::Read);

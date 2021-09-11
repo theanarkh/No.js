@@ -2,6 +2,7 @@ const {
     loader,
 } = No;
 
+const map = {};
 class Module {
     constructor(filename) {
         this.filename = filename;
@@ -12,9 +13,12 @@ class Module {
         result.call(this, Module.load, this.exports, this);
         return this.exports;
     }
-    static load(...args) {
-        const module = new Module(...args);
-        return module.load();
+    static load(filename, ...args) {
+        if (map[filename]) {
+            return map[filename];
+        }
+        const module = new Module(filename, ...args);
+        return (map[filename] = module.load());
     }
 };
 

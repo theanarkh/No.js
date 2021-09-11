@@ -57,7 +57,12 @@ void No::Net::Connect(V8_ARGS) {
 }
 
 void No::Net::Setsockopt(V8_ARGS) {    
-    
+    int fd = args[0].As<Integer>()->Value();
+    int level = args[1].As<Integer>()->Value();
+    int name = args[2].As<Integer>()->Value();
+    int value = args[3].As<Integer>()->Value();
+    socklen_t len = sizeof(value);
+    setsockopt(fd, level, name, (void *)&value, len);
 }
 
 void No::Net::Listen(V8_ARGS) {
@@ -100,18 +105,56 @@ void No::Net::Accept(V8_ARGS) {
 void No::Net::Init(Isolate* isolate, Local<Object> target) {
   Local<ObjectTemplate> net = ObjectTemplate::New(isolate);
   Local<ObjectTemplate> constant = ObjectTemplate::New(isolate);
-  Local<ObjectTemplate> domain = ObjectTemplate::New(isolate);
-  setObjectTemplateValue(isolate, domain, "AF_UNIX", Number::New(isolate, AF_UNIX));
-  setObjectTemplateValue(isolate, domain, "AF_INET", Number::New(isolate, AF_INET));
-  setObjectTemplateValue(isolate, domain, "AF_INET6", Number::New(isolate, AF_INET6));
+  {
+    Local<ObjectTemplate> domain = ObjectTemplate::New(isolate);
+    setObjectTemplateValue(isolate, domain, "AF_UNIX", Number::New(isolate, AF_UNIX));
+    setObjectTemplateValue(isolate, domain, "AF_INET", Number::New(isolate, AF_INET));
+    setObjectTemplateValue(isolate, domain, "AF_INET6", Number::New(isolate, AF_INET6));
+    setObjectTemplateValue(isolate, constant, "domain", domain);
+  }
 
-  Local<ObjectTemplate> type = ObjectTemplate::New(isolate);
-  setObjectTemplateValue(isolate, type, "SOCK_STREAM", Number::New(isolate, SOCK_STREAM));
-  setObjectTemplateValue(isolate, type, "SOCK_DGRAM", Number::New(isolate, SOCK_DGRAM));
-  setObjectTemplateValue(isolate, type, "SOCK_RAW", Number::New(isolate, SOCK_RAW));
+  {
+    Local<ObjectTemplate> type = ObjectTemplate::New(isolate);
+    setObjectTemplateValue(isolate, type, "SOCK_STREAM", Number::New(isolate, SOCK_STREAM));
+    setObjectTemplateValue(isolate, type, "SOCK_DGRAM", Number::New(isolate, SOCK_DGRAM));
+    setObjectTemplateValue(isolate, type, "SOCK_RAW", Number::New(isolate, SOCK_RAW));  
+    setObjectTemplateValue(isolate, constant, "type", type);
+  }
+  
+  {
+    Local<ObjectTemplate> level = ObjectTemplate::New(isolate);
+    setObjectTemplateValue(isolate, level, "SOL_SOCKET", Number::New(isolate, SOL_SOCKET));
+    setObjectTemplateValue(isolate, constant, "level", level);
+  }
 
-  setObjectTemplateValue(isolate, constant, "domain", domain);
-  setObjectTemplateValue(isolate, constant, "type", type);
+  {
+    Local<ObjectTemplate> socketOption = ObjectTemplate::New(isolate);
+    #define MODE_LIST(Set) \
+        Set(SO_DEBUG) \
+        Set(SO_REUSEADDR) \
+        Set(SO_TYPE) \
+        Set(SO_ERROR) \
+        Set(SO_DONTROUTE) \
+        Set(SO_BROADCAST) \
+        Set(SO_SNDBUF) \
+        Set(SO_RCVBUF) \
+        Set(SO_SNDBUFFORCE) \
+        Set(SO_RCVBUFFORCE) \
+        Set(SO_KEEPALIVE) \
+        Set(SO_OOBINLINE) \
+        Set(SO_NO_CHECK) \
+        Set(SO_PRIORITY) \
+        Set(SO_LINGER) \
+        Set(SO_BSDCOMPAT) \
+        Set(SO_REUSEPORT) 
+    #define Set(val) setObjectTemplateValue(isolate, socketOption, #val, Number::New(isolate, val));
+        MODE_LIST(Set)
+    #undef Set
+  #undef MODE_LIST
+    
+    setObjectTemplateValue(isolate, constant, "socketOption", socketOption);
+  }
+    
 
   setObjectTemplateValue(isolate, net, "constant", constant);
   setObjectValue(isolate, target, "net", net->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
