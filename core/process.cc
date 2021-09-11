@@ -61,11 +61,22 @@ void No::Process::Execve(V8_ARGS) {
 }
 
 void No::Process::Init(Isolate* isolate, Local<Object> target) {
+  Local<Context> context = isolate->GetCurrentContext();
+  Environment * env = Environment::GetEnvByContext(context);
   Local<ObjectTemplate> process = ObjectTemplate::New(isolate);
   setMethod(isolate, process, "getEnv", No::Process::GetEnv);
   setMethod(isolate, process, "fork", No::Process::Fork);
   setMethod(isolate, process, "wait", No::Process::Wait);
   setMethod(isolate, process, "exit", No::Process::Exit);
   setMethod(isolate, process, "execve", No::Process::Execve);
-  setObjectValue(isolate, target, "process", process->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
+  char ** argv = env->getArgv();
+  int argc = env->getArgc();
+  Local<Array> arr = Array::New(isolate, argc);
+  for (int i = 0; i < argc; i++) {
+      arr->Set(context, Number::New(isolate, i), newStringToLcal(isolate, argv[i]));
+  }
+  
+  Local<Object> obj = process->NewInstance(isolate->GetCurrentContext()).ToLocalChecked();
+  setObjectValue(isolate, obj, "argv", arr);
+  setObjectValue(isolate, target, "process", obj);
 }

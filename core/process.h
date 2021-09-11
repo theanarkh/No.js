@@ -13,9 +13,11 @@
 
 #include "util.h"
 #include "include/common.h"
+#include "env.h"
 
 using namespace v8;
 using namespace No::Util;
+using namespace No::Env;
 
 namespace No {
     namespace Process {

@@ -34,6 +34,8 @@ int main(int argc, char* argv[]) {
     Local<ObjectTemplate> global = ObjectTemplate::New(isolate);
     Local<Context> context = Context::New(isolate, nullptr, global);
     Environment * env = new Environment(context);
+    env->setArgv(argv);
+    env->setArgc(argc);
     Context::Scope context_scope(context);
     Local<Object> No = Object::New(isolate);
     register_builtins(isolate, No);
@@ -46,14 +48,13 @@ int main(int argc, char* argv[]) {
       NewStringType::kNormal), globalInstance).Check();
     {
       // 打开文件
-      int fd = open(argv[1], O_RDONLY);
+      int fd = open("No.js", 0, O_RDONLY);
       struct stat info;
       // 取得文件信息
       fstat(fd, &info);
       // 分配内存保存文件内容
       char *ptr = (char *)malloc(info.st_size + 1);
       // ptr[info.st_size] = '\0';
-      // 读取文件搭配ptr，Mac os的read函数定义第二个参数是void *
       read(fd, (void *)ptr, info.st_size);
       // 要执行的js代码
       Local<String> source = String::NewFromUtf8(isolate, ptr,

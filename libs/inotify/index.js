@@ -1,6 +1,6 @@
+
 const {
     inotify,
-    console
 } = No;
 
 const map = {};
@@ -52,7 +52,7 @@ function unwatch(filename, callback) {
     
 }
 
-watch('/home/cyb/code/No.js/hello.js', () => {
-    console.log(2);
-    unwatch('/home/cyb/code/No.js/hello.js')
-})
+module.exports = {
+    watch,
+    unwatch
+}

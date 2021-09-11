@@ -14,6 +14,7 @@
 #include "signal.h"
 #include "timer.h"
 #include "inotify.h"
+#include "loader.h"
 
 using namespace v8;
 using namespace No;

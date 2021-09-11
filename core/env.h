@@ -36,11 +36,25 @@ namespace No {
                 int getInotifyFd() {
                     return inotify_fd;
                 }
+                void setArgv(char **_argv) {
+                    argv = _argv;
+                }
+                char ** getArgv() {
+                    return argv;
+                }
+                void setArgc(int _argc) {
+                    argc = _argc;
+                }
+                int getArgc() {
+                    return argc;
+                }
             private:
                 struct io_uring_info *io_uring_data;
                 Global<Context> _context;
                 Isolate * _isolate;
                 int inotify_fd;
+                int argc;
+                char **argv;
         };
 
         struct RequestContext {
