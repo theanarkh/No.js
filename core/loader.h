@@ -5,6 +5,7 @@
 #include "util.h"
 #include "env.h"
 #include <vector>
+#include <unistd.h>
 using namespace v8;
 using namespace No::Util;
 using namespace No::Env;
