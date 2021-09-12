@@ -14,3 +14,6 @@
 2 echo "/core/%e.core.%p" > /proc/sys/kernel/core_pattern  
 3 ulimit -c unlimited  
 4 gdb ./No coredump文件的路径  
+
+四  
+[No.js---基于V8和io_uring的JS运行时](https://zhuanlan.zhihu.com/p/407085340)
