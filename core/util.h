@@ -39,6 +39,8 @@ namespace No {
             private:
                 uint64_t id;
         };
+        void GetError(V8_ARGS);
+        void Init(Isolate* isolate, Local<Object> target);
     }
 }
 

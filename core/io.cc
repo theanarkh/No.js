@@ -84,6 +84,24 @@ void No::IO::Close(V8_ARGS) {
     SubmitRequest((struct request *)req, io_uring_data); 
 }
 
+void No::IO::ReadSync(V8_ARGS) {
+    V8_ISOLATE
+    int fd = args[0].As<Uint32>()->Value();
+    Local<ArrayBuffer> arrayBuffer = args[1].As<ArrayBuffer>();
+    std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
+    Local<Integer> ret = Integer::New(isolate, read(fd, backing->Data(), backing->ByteLength()));
+    V8_RETURN(ret);
+}
+
+void No::IO::WriteSync(V8_ARGS) {
+    V8_ISOLATE
+    int fd = args[0].As<Uint32>()->Value();
+    Local<ArrayBuffer> arrayBuffer = args[1].As<ArrayBuffer>();
+    std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
+    Local<Integer> ret = Integer::New(isolate, write(fd, backing->Data(), backing->ByteLength()));
+    V8_RETURN(ret);
+}
+
 void No::IO::Init(Isolate* isolate, Local<Object> target) {
   Local<ObjectTemplate> io = ObjectTemplate::New(isolate);
   setMethod(isolate, io, "read", No::IO::Read);
@@ -91,6 +109,8 @@ void No::IO::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, io, "readv", No::IO::ReadV);
   setMethod(isolate, io, "writev", No::IO::WriteV);
   setMethod(isolate, io, "close", No::IO::Close);
+  setMethod(isolate, io, "readSync", No::IO::ReadSync);
+  setMethod(isolate, io, "writeSync", No::IO::WriteSync);
   setObjectValue(isolate, target, "io", io->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }
 

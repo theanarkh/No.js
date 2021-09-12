@@ -98,6 +98,10 @@ static void InitConstant(Isolate* isolate, Local<ObjectTemplate> target) {
   #undef MODE_LIST
 
    #define FLAG_LIST(Set) \
+    Set(O_ACCMODE) \
+    Set(O_RDONLY) \
+    Set(O_WRONLY) \
+    Set(O_RDWR) \
     Set(O_APPEND) \
     Set(O_ASYNC) \
     Set(O_CLOEXEC) \
@@ -137,6 +141,8 @@ void No::FS::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, fs, "writev", No::IO::WriteV);
   setMethod(isolate, fs, "dup", No::FS::Dup);
   setMethod(isolate, fs, "dup2", No::FS::Dup2);
+  setMethod(isolate, fs, "readSync", No::IO::ReadSync);
+  setMethod(isolate, fs, "writeSync", No::IO::WriteSync);
   InitConstant(isolate, fs);
   setObjectValue(isolate, target, "fs", fs->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }

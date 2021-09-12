@@ -57,6 +57,8 @@ void No::UDP::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, udp, "close", No::IO::Close);
   setMethod(isolate, udp, "connect", No::Net::Connect);
   setMethod(isolate, udp, "setsockopt", No::Net::Setsockopt);
+  setMethod(isolate, udp, "readSync", No::IO::ReadSync);
+  setMethod(isolate, udp, "writeSync", No::IO::WriteSync);
   setObjectValue(isolate, target, "udp", udp->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }
 

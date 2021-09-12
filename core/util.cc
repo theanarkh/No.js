@@ -54,3 +54,15 @@ Local<Context> No::Util::PersistentToLocal::Strong(const PersistentBase<Context>
 char * No::Util::GetErrorByErrno() {
     return strerror(errno);
 }
+
+void No::Util::GetError(V8_ARGS) {
+    V8_ISOLATE
+    const char * error = No::Util::GetErrorByErrno();
+    V8_RETURN(newStringToLcal(isolate, error));
+}
+
+void No::Util::Init(Isolate* isolate, Local<Object> target) {
+    Local<ObjectTemplate> util = ObjectTemplate::New(isolate);
+    No::Util::setMethod(isolate, util, "getErrorByErrno", No::Util::GetError);
+    No::Util::setObjectValue(isolate, target, "util", util->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
+}

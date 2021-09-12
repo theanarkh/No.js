@@ -28,6 +28,8 @@ namespace No {
         void ReadV(V8_ARGS);
         void WriteV(V8_ARGS);
         void Close(V8_ARGS);
+        void ReadSync(V8_ARGS);
+        void WriteSync(V8_ARGS);
         void Init(Isolate* isolate, Local<Object> target);
     }
 }
