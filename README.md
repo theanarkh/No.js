@@ -12,5 +12,5 @@
 三 core dump 排查  
 1 sudo su  
 2 echo "/core/%e.core.%p" > /proc/sys/kernel/core_pattern  
-3 ulimit -c unlimited  
+3 exit && ulimit -c unlimited  
 4 gdb ./No coredump文件的路径  

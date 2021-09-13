@@ -20,7 +20,7 @@ using namespace No::Env;
 namespace No {
     namespace VM {
         void Run(V8_ARGS);
-        // void CompileFunction(V8_ARGS);
+        void CompileFunction(V8_ARGS);
         void Init(Isolate* isolate, Local<Object> target);
     }
 }
