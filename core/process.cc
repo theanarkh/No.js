@@ -7,7 +7,6 @@ void No::Process::GetEnv(V8_ARGS) {
     if (value == nullptr) {
         return V8_RETURN(Local<Value>());
     }
-    Log(value);
     Local<String> str = String::NewFromUtf8(isolate, value, NewStringType::kNormal, strlen(value)).ToLocalChecked();
     V8_RETURN(str);
 }
@@ -60,6 +59,49 @@ void No::Process::Execve(V8_ARGS) {
     }
 }
 
+
+void EnvGetter(Local<Name> name, const v8::PropertyCallbackInfo<v8::Value>& args) {
+  V8_ISOLATE     
+  // to do: handle the key of toString
+  String::Utf8Value key(isolate, name);
+  char * value = getenv(*key);
+  if (value == nullptr) {
+    return V8_RETURN(Local<Value>());
+  }
+  V8_RETURN(newStringToLcal(isolate, value));      
+}
+
+static void EnvSetter(Local<Name> key,
+                      Local<Value> value,
+                      const PropertyCallbackInfo<Value>& args) {                                                  
+  V8_ISOLATE
+  V8_CONTEXT
+  Local<String> key_strng = key.As<String>();
+  Local<String> value_string = value.As<String>();;
+  if (key.IsEmpty() || value.IsEmpty()) {
+    return;
+  }
+
+  {
+    String::Utf8Value key(isolate, key_strng);
+    String::Utf8Value value(isolate, value_string);
+    setenv(*key, *value, 1);
+  }
+}
+
+static void EnvDeleter(Local<Name> key,
+                       const PropertyCallbackInfo<Boolean>& args) {
+  V8_ISOLATE                        
+  Local<String> keyObject = key.As<String>();
+  String::Utf8Value key_stirng(isolate, keyObject);
+  unsetenv(*key_stirng);
+  V8_RETURN(true)
+}
+
+static void EnvEnumerator(const PropertyCallbackInfo<Array>& args) {
+    // to do
+}
+
 void No::Process::Init(Isolate* isolate, Local<Object> target) {
   Local<Context> context = isolate->GetCurrentContext();
   Environment * env = Environment::GetEnvByContext(context);
@@ -76,7 +118,15 @@ void No::Process::Init(Isolate* isolate, Local<Object> target) {
       arr->Set(context, Number::New(isolate, i), newStringToLcal(isolate, argv[i]));
   }
   
+  Local<ObjectTemplate> env_proxy_template = ObjectTemplate::New(isolate);
+  Local<Object> env_obj = Object::New(isolate);
+  // env_obj->Set(context, newStringToLcal(isolate, "x"), newStringToLcal(isolate, "y"));
+  env_proxy_template->SetHandler(NamedPropertyHandlerConfiguration(
+      EnvGetter, EnvSetter, nullptr, EnvDeleter, EnvEnumerator, Local<Value>(),
+      PropertyHandlerFlags::kHasNoSideEffect));
+  
   Local<Object> obj = process->NewInstance(isolate->GetCurrentContext()).ToLocalChecked();
+  obj->Set(context, newStringToLcal(isolate, "env"), env_proxy_template->NewInstance(context).ToLocalChecked());
   setObjectValue(isolate, obj, "argv", arr);
   setObjectValue(isolate, target, "process", obj);
 }

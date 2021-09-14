@@ -9,8 +9,8 @@ void No::TCP::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, tcp, "close", No::IO::Close);
   setMethod(isolate, tcp, "connect", No::Net::Connect);
   setMethod(isolate, tcp, "setsockopt", No::Net::Setsockopt);
-  setMethod(isolate, tcp, "readSync", No::IO::ReadSync);
-  setMethod(isolate, tcp, "writeSync", No::IO::WriteSync);
+  setMethod(isolate, tcp, "read", No::IO::Read);
+  setMethod(isolate, tcp, "write", No::IO::Write);
   setObjectValue(isolate, target, "tcp", tcp->NewInstance(isolate->GetCurrentContext()).ToLocalChecked());
 }
 

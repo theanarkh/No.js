@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/No",
-            "args": ["test/vm/index.js"],
+            "args": ["test/process/process.js"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}/",
             "environment": [],

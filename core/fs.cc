@@ -1,6 +1,6 @@
 #include "fs.h"
 
-void No::FS::Open(V8_ARGS) {
+void No::FS::OpenSync(V8_ARGS) {
   V8_ISOLATE
   String::Utf8Value filename(isolate, args[0]);
   int argc = args.Length();
@@ -131,7 +131,7 @@ static void InitConstant(Isolate* isolate, Local<ObjectTemplate> target) {
 }
 void No::FS::Init(Isolate* isolate, Local<Object> target) {
   Local<ObjectTemplate> fs = ObjectTemplate::New(isolate);
-  setMethod(isolate, fs, "open", No::FS::Open);
+  setMethod(isolate, fs, "openSync", No::FS::OpenSync);
   setMethod(isolate, fs, "realpath", No::FS::Realpath);
   setMethod(isolate, fs, "openat", No::FS::OpenAt);
   setMethod(isolate, fs, "close", No::IO::Close);

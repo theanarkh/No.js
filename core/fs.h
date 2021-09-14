@@ -23,7 +23,7 @@ using namespace No::io_uring;
 
 namespace No {
     namespace FS {
-        void Open(V8_ARGS);
+        void OpenSync(V8_ARGS);
         void Realpath(V8_ARGS);
         void OpenAt(V8_ARGS);
         void Dup(V8_ARGS);

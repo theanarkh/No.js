@@ -1,7 +1,5 @@
 #include "io_uring.h"
 #include <stdio.h>
-struct sockaddr sa;
-	socklen_t sa_size = sizeof(sa);
 // 向内核提交一个请求
 void No::io_uring::SubmitRequest(struct request * req, struct io_uring_info *io_uring_data) {
     // 获取一个io_uring的请求结构体
@@ -38,6 +36,9 @@ void No::io_uring::SubmitRequest(struct request * req, struct io_uring_info *io_
         case IORING_OP_ACCEPT: 
         {
             struct tcp_request * tcp_req = (struct tcp_request *)req;
+            // to do
+            struct sockaddr sa;
+            socklen_t sa_size = sizeof(sa);
             io_uring_prep_accept(sqe, tcp_req->fd, &sa,
                             &sa_size, 0);
                 break;

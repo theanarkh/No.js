@@ -5,10 +5,6 @@ void No::Loader::Compile(V8_ARGS) {
     V8_ISOLATE
     V8_CONTEXT
     String::Utf8Value filename(isolate, args[0].As<String>());
-    // Local<Object> ext[1];
-    // Local<Object> obj = Object::New(isolate);
-    // obj->Set(context, newStringToLcal(isolate ,"xx"), newStringToLcal(isolate, "yy"));
-    // ext[0] = obj;
     int fd = open(*filename, 0 , O_RDONLY);
     std::string content;
     char buffer[4096];
@@ -38,15 +34,6 @@ void No::Loader::Compile(V8_ARGS) {
     } else {
       args.GetReturnValue().Set(fun.ToLocalChecked());
     }
-    
-    // Local<Value> arg_value[] = {
-    //   Number::New(isolate, 42.0)
-    // };
-    // Local<Value> result = fun->Call(context, context->Global(), 2, arg_value).ToLocalChecked();
-    // if (!result.IsEmpty()) {
-    //     args.GetReturnValue().Set(result.ToLocalChecked());
-    // }
-    
 }
 
 void No::Loader::Init(Isolate* isolate, Local<Object> target) {
