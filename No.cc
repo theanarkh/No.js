@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include "include/v8/libplatform/libplatform.h"
 #include "include/v8/v8.h"
+#include "core/env.h"
 #include "core/core.h"
 #include "core/util.h"
 
@@ -32,6 +33,9 @@ int main(int argc, char* argv[]) {
     HandleScope handle_scope(isolate);
     Local<ObjectTemplate> global = ObjectTemplate::New(isolate);
     Local<Context> context = Context::New(isolate, nullptr, global);
+    Environment * env = new Environment(context);
+    env->setArgv(argv);
+    env->setArgc(argc);
     Context::Scope context_scope(context);
     Local<Object> No = Object::New(isolate);
     register_builtins(isolate, No);
