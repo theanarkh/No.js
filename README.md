@@ -1,6 +1,6 @@
 <img src="https://img-blog.csdnimg.cn/4a6c5376c93d43baa090fdefecbb65a2.png" /> 
 
-简介：No.js：基于V8和io_uring的JS运行时，只支持Linux5.5及以上  <br/>
+No.js：基于V8和io_uring的JS运行时，只支持Linux5.5及以上  <br/>
 
 一 使用
 1 执行make编译  
