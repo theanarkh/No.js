@@ -1,5 +1,3 @@
-# No.js
-
 <img src="https://img-blog.csdnimg.cn/4a6c5376c93d43baa090fdefecbb65a2.png" /> 
 一 简介：基于V8的JS运行时，只支持Linux5.5及以上  
 1 执行make编译  
