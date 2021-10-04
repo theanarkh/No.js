@@ -1,6 +1,6 @@
 #include "HTTP_Parser.h"
 
-int HTTP_Parser::on_message_begin(llhttp_t* parser)
+int No::HTTP::HTTP_Parser::on_message_begin(llhttp_t* parser)
         {
             major_version = 0;
             minor_version = 0;
@@ -19,31 +19,31 @@ int HTTP_Parser::on_message_begin(llhttp_t* parser)
             return 0;
         }
 
-int HTTP_Parser::on_status(llhttp_t* parser, const char* at, size_t length)
+int No::HTTP::HTTP_Parser::on_status(llhttp_t* parser, const char* at, size_t length)
 {
     status.append(at, length);
     return 0;
 }
 
-int HTTP_Parser::on_url(llhttp_t* parser, const char* at, size_t length)
+int No::HTTP::HTTP_Parser::on_url(llhttp_t* parser, const char* at, size_t length)
 { 
     url.append(at, length);
     return 0;
 }
 
-int HTTP_Parser::on_header_field(llhttp_t* parser, const char* at, size_t length)
+int No::HTTP::HTTP_Parser::on_header_field(llhttp_t* parser, const char* at, size_t length)
 {   
     keys.push_back(string(at, length));
     return 0;
 }
 
-int HTTP_Parser::on_header_value(llhttp_t* parser, const char* at, size_t length)
+int No::HTTP::HTTP_Parser::on_header_value(llhttp_t* parser, const char* at, size_t length)
 {
     values.push_back(string(at, length));
     return 0;
 }
 
-int HTTP_Parser::on_headers_complete(llhttp_t* parser)
+int No::HTTP::HTTP_Parser::on_headers_complete(llhttp_t* parser)
 {
     header_end_time = time(NULL);
     major_version = parser->http_major;
@@ -53,19 +53,19 @@ int HTTP_Parser::on_headers_complete(llhttp_t* parser)
     return 0;
 }
 
-int HTTP_Parser::on_body(llhttp_t* parser, const char* at, size_t length)
+int No::HTTP::HTTP_Parser::on_body(llhttp_t* parser, const char* at, size_t length)
 {
     body.append(at, length);
     return 0;
 }
 
-int HTTP_Parser::on_message_complete(llhttp_t* parser)
+int No::HTTP::HTTP_Parser::on_message_complete(llhttp_t* parser)
 {
     message_end_time = time(NULL);
     return 0;
 }
 
-int HTTP_Parser::parse(const char* data, int len) {
+int No::HTTP::HTTP_Parser::parse(const char* data, int len) {
     enum llhttp_errno err = llhttp_execute(&parser, data, len);
 
     if (err != HPE_OK) {
@@ -75,7 +75,7 @@ int HTTP_Parser::parse(const char* data, int len) {
     return 0;
 }
 
-void HTTP_Parser::print() {
+void No::HTTP::HTTP_Parser::print() {
     cout<<"parse start: "<<ctime(&parse_start_time);
     cout<<"url: "<<url<<endl;
     cout<<"headers: "<<endl;
@@ -88,7 +88,7 @@ void HTTP_Parser::print() {
     printf("major_version: %d major_version: %d keppalive: %d upgrade: %d", major_version, minor_version, keepalive, upgrade);
 }
 
-llhttp_settings_t HTTP_Parser::settings = {
+llhttp_settings_t No::HTTP::HTTP_Parser::settings = {
     [](llhttp_t * parser) {
         return ((HTTP_Parser *)parser->data)->on_message_begin(parser);
     },
