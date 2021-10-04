@@ -5,15 +5,27 @@ void No::HTTP::Parser::New(const FunctionCallbackInfo<Value>& args) {
     new Parser(env, args.This());
 }
 
+void No::HTTP::Parser::Parse(const char * data, size_t len) {
+    // string str;
+    // str.append(data, len);
+    // cout<<str;
+    httpparser->parse(data, len);
+    // httpparser->print();
+}
+
 void No::HTTP::Parser::Parse(const FunctionCallbackInfo<Value>& args) {
-    
+    Parser * parser = (Parser *)unwrap(args.This());
+    Local<ArrayBuffer> arrayBuffer = args[0].As<ArrayBuffer>();
+    std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
+    const char * data = (const char * )backing->Data();
+    parser->Parse(data, strlen(data));
 }
 
 void No::HTTP::Init(Isolate* isolate, Local<Object> target) {
     Local<FunctionTemplate> parser = FunctionTemplate::New(isolate, No::HTTP::Parser::New);
     parser->InstanceTemplate()->SetInternalFieldCount(1);
-    parser->SetClassName(newString(isolate, "HTTPParser"));
-    parser->PrototypeTemplate()->Set(newString(isolate, "parse"), FunctionTemplate::New(isolate, No::HTTP::Parser::Parse));
+    parser->SetClassName(newStringToLcal(isolate, "HTTPParser"));
+    parser->PrototypeTemplate()->Set(newStringToLcal(isolate, "parse"), FunctionTemplate::New(isolate, No::HTTP::Parser::Parse));
     setObjectValue(isolate, target, "HTTPParser", parser->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 }
 

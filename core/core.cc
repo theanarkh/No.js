@@ -15,6 +15,7 @@ void No::Core::register_builtins(Isolate * isolate, Local<Object> target) {
     Loader::Init(isolate, target);
     Util::Init(isolate, target);
     VM::Init(isolate, target);
+    HTTP::Init(isolate, target);
 }
 
 void No::Core::Run(io_uring_info * io_uring_data) {

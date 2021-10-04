@@ -20,8 +20,12 @@ namespace No {
         void setObjectValue(Isolate *isolate, Local<Object> recv, const char *name, Local<Value> value);
         class PersistentToLocal {
             public:
-//                template <class TypeName>
-                static Local<Context> Strong(const PersistentBase<Context>& persistent);
+                template <typename TypeName>
+                static Local<TypeName> Strong(const PersistentBase<TypeName>& persistent) {
+                    return *reinterpret_cast<Local<TypeName>*>(
+                        const_cast<PersistentBase<TypeName>*>(&persistent)
+                    );
+                };
         };
         template <typename T>
         struct KeyCompare {

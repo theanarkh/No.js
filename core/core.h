@@ -17,6 +17,7 @@
 #include "loader.h"
 #include "util.h"
 #include "vm.h"
+#include "http.h"
 
 using namespace v8;
 using namespace No;
