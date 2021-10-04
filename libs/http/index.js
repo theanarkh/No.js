@@ -32,7 +32,8 @@ class HTTPRequest extends No.libs.events {
             this.keepalive = data.keepalive;
             this.upgrade = data.upgrade;
             this.headers = data.headers;
-            this.server.emit('request', this);
+            const response = new HTTPResponse({socket, server});
+            this.server.emit('request', this, response);
         }
         this.httpparser.onBody = (data) => {
             this.emit('data', data);
@@ -44,6 +45,21 @@ class HTTPRequest extends No.libs.events {
         socket.on('data', (buffer) => {
             this.httpparser.parse(buffer);
         });
+        socket.on('end', () => {
+            this.emit('end');
+        });
+    }
+}
+
+class HTTPResponse extends No.libs.events {
+    socket = null;
+    constructor({socket, server}) {
+        super();
+        this.server = server;
+        this.socket = socket;
+    }
+    write(buffer) {
+        this.socket.write(buffer);
     }
 }
 

@@ -23,6 +23,9 @@ class Server extends events {
 
 class Socket extends events {
     fd = -1;
+    write(buffer) {
+        tcp.write(this.fd, buffer);
+    }
 }
 
 class ClientSocket extends Socket {
@@ -43,10 +46,12 @@ class ServerSocket extends Socket {
         const buffer = new ArrayBuffer(1024);
         tcp.read(this.fd, buffer, 0, (status) => {
             if (status === 0) {
-
-            } else {
+                this.emit('end');
+            } else if (status > 0){
                 this.emit('data', buffer);
                 this.read();
+            } else {
+                this.emit('error', new Error('read socket error'));
             }
         })
     }
