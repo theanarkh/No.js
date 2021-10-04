@@ -44,13 +44,6 @@ void No::Util::setObjectValue(Isolate *isolate,
         value);
 }
 
-// template <class TypeName>
-Local<Context> No::Util::PersistentToLocal::Strong(const PersistentBase<Context>& persistent) {
-    return *reinterpret_cast<Local<Context>*>(
-        const_cast<PersistentBase<Context>*>(&persistent)
-    );
-}
-
 char * No::Util::GetErrorByErrno() {
     return strerror(errno);
 }

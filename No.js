@@ -10,9 +10,21 @@ function loaderNativeModule() {
             name: 'module'
         },
         {
+            module: 'libs/events/index.js',
+            name: 'events'
+        },
+        {
             module: 'libs/inotify/index.js',
             name: 'inotify'
-        }
+        },
+        {
+            module: 'libs/tcp/index.js',
+            name: 'tcp'
+        },
+        {
+            module: 'libs/http/index.js',
+            name: 'http'
+        },
     ];
     No.libs = {};
     for (let i = 0; i < modules.length; i++) {
@@ -21,7 +33,6 @@ function loaderNativeModule() {
         };
         loader.compile(modules[i].module).call(null, loader.compile, module.exports, module);
         No.libs[modules[i].name] = module.exports;
-        
     }
 }
 

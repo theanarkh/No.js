@@ -50,18 +50,47 @@ int No::HTTP::HTTP_Parser::on_headers_complete(llhttp_t* parser)
     minor_version = parser->http_minor;
     upgrade = parser->upgrade;
     keepalive = llhttp_should_keep_alive(parser);
+    if (callback.on_headers_complete) {
+        on_headers_complete_info info = {
+            major_version,
+            minor_version,
+            upgrade,
+            keepalive,
+            parse_start_time,
+            header_end_time,
+            message_end_time,
+            url,
+            status,
+            keys,
+            values,
+        };
+        callback.on_headers_complete(info, callback);
+    }
     return 0;
 }
 
 int No::HTTP::HTTP_Parser::on_body(llhttp_t* parser, const char* at, size_t length)
 {
     body.append(at, length);
+     if (callback.on_body) {
+        on_body_info info = {
+            string(at, length)
+        };
+        callback.on_body(info, callback);
+    }
     return 0;
 }
 
 int No::HTTP::HTTP_Parser::on_message_complete(llhttp_t* parser)
 {
     message_end_time = time(NULL);
+    if (callback.on_body_complete) {
+        on_body_complete_info info = {
+            body
+        };
+        callback.on_body_complete(info, callback);
+    }
+    
     return 0;
 }
 

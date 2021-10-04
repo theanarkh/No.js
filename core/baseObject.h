@@ -11,11 +11,16 @@ using namespace No::Env;
 namespace No {
     namespace Base {
         class BaseObject {
-            BaseObject(Environment* env, Local<Object> object);
-            Environment* BaseObject::env();
+            public:
+                BaseObject(Environment* env, Local<Object> object);
+                ~BaseObject();
+                Environment* env() const;
+                Local<Object> object();
+                static void * unwrap(Local<Object> object);
             private: 
-                Environment _env;
-        }
+                Environment * _env;
+                Global<Object> _object;
+        };
     }
 }
 
