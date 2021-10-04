@@ -1,6 +1,8 @@
 <img src="https://img-blog.csdnimg.cn/4a6c5376c93d43baa090fdefecbb65a2.png" /> 
 
-一 简介：基于V8的JS运行时，只支持Linux5.5及以上  
+简介：基于V8的JS运行时，只支持Linux5.5及以上  <br/>
+
+一 使用
 1 执行make编译  
 2 ./No your js file or 软链到系统路径：sudo ln -s /Users/name/code/tmp/demo/No.js/No /usr/local/bin/No  
 3 执行test目录下的例子
