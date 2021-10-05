@@ -2,7 +2,7 @@ const {
     tcp,
     console,
     net,
-} = No;
+} = No.buildin;
 const { constant } = net;
 
 {

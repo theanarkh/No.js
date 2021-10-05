@@ -1,4 +1,8 @@
 
+const {
+    console,
+} = No.buildin;
+
 function toUTF8(str) {
     const chars = [...str];
     const bytes = [];
@@ -47,7 +51,7 @@ function countByte(byte) {
     return bytelen || 1;
 }
 
-function fromUTF8(bytes = toUTF8(a)) {
+function fromUTF8(bytes) {
     let i = 0;
     const chars = [];
     while(i < bytes.length) {
@@ -81,20 +85,71 @@ function fromUTF8(bytes = toUTF8(a)) {
                 throw new Error('invalid byte');
         }
     }
-    console.log(chars.join(''));
     return chars.join('');
 }
 
-fromUTF8();
-
-const Buffer = Object.create(null);
-Buffer.from = function(str) {
-    const chars = toUTF8(str);
-    const arr = new ArrayBuffer(chars.length);
-    const bytes = new Uint8Array(arr);
-    for (let i = 0; i < arr.length; i++) {
-        bytes[i] = chars[i];
+class Buffer {
+    bytes = null;
+    memory = null;
+    constructor({ length }) {
+        this.memory = new ArrayBuffer(length);
+        this.bytes = new Uint8Array(this.memory);
+        this.byteLength = length;
     }
-    return bytes;
+
+    toString(encoding = 'UTF-8') {
+        return fromUTF8(this.bytes);
+    }
+
+    getBuffer() {
+        return this.memory;
+    }
+
+    getBytes() {
+        return this.bytes;
+    }
+
+    static strlen(str) {
+        return toUTF8(str).length;
+    }
+
+    static from(str) {
+        const chars = toUTF8(str);
+        const buffer = new Buffer({length: chars.length});
+        for (let i = 0; i < buffer.byteLength; i++) {
+            buffer.bytes[i] = chars[i];
+        }
+        return buffer;
+    }
+    get(index) {
+        return this.bytes && this.bytes[index]
+    }
+    set(index, value) {
+        return this.bytes && (this.bytes[index] = value);
+    }
+    static toString(bytes) {
+        return fromUTF8(bytes);
+    }
+
+    static concat(arr) {
+        let len = 0;
+        for (let i = 0; i < arr.length; i++) {
+            len += arr[i].byteLength;
+        }
+        const newBuffer = Buffer.alloc(len);
+        let index = 0;
+        for (let i = 0; i < arr.length; i++) {
+            const buffer = arr[i];
+            for (let j = 0; j < buffer.byteLength; j++) {
+                newBuffer.set(index++, buffer.bytes[j]);
+            }
+        }
+        return newBuffer;
+    }
+
+    static alloc(length) {
+        return new Buffer({ length });
+    }
 }
+
 module.exports = Buffer;

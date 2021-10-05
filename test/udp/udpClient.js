@@ -2,7 +2,7 @@ const {
     udp,
     console,
     net,
-} = No;
+} = No.buildin;
 const { constant } = net;
 
 const fd = udp.socket(constant.domain.AF_INET, constant.type.SOCK_DGRAM);

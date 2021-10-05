@@ -2,7 +2,7 @@ const {
     tcp,
     console,
     net,
-} = No;
+} = No.buildin;
 const { constant } = net;
 
 const fd = tcp.socket(constant.domain.AF_INET, constant.type.SOCK_STREAM);

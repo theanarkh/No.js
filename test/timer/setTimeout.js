@@ -1,7 +1,7 @@
 const {
     console,
     timer
-} = No;
+} = No.buildin;
 const id1 = timer.setTimeout(() => {
     console.log("timeout 3s")
 },3000);

@@ -21,6 +21,12 @@ void No::Process::Wait(V8_ARGS) {
     wait(&status);
 }
 
+void No::Process::Cwd(V8_ARGS) {
+    V8_ISOLATE
+    char * cwd = getcwd(nullptr, 0);
+    V8_RETURN(newStringToLcal(isolate, cwd));
+}
+
 void No::Process::Exit(V8_ARGS) {
     int status = 0;
     if (args.Length() > 0) {
@@ -109,6 +115,7 @@ void No::Process::Init(Isolate* isolate, Local<Object> target) {
   setMethod(isolate, process, "getEnv", No::Process::GetEnv);
   setMethod(isolate, process, "fork", No::Process::Fork);
   setMethod(isolate, process, "wait", No::Process::Wait);
+  setMethod(isolate, process, "cwd", No::Process::Cwd);
   setMethod(isolate, process, "exit", No::Process::Exit);
   setMethod(isolate, process, "execve", No::Process::Execve);
   char ** argv = env->getArgv();

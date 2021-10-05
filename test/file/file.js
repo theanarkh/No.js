@@ -1,7 +1,7 @@
 const {
     fs,
     console
-} = No;
+} = No.buildin;
 const fd = fs.openSync('./test/file/1.txt');
 const arr = new ArrayBuffer(100);
 fs.readv(fd,arr , 0, (res) => {console.log(res)});

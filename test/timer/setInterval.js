@@ -1,7 +1,7 @@
 const {
     console,
     timer
-} = No;
+} = No.buildin;
 
 const id = timer.setInterval(() => {
     console.log("timeout");

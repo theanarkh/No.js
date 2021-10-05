@@ -1,7 +1,7 @@
 const {
     console,
     libs
-} = No;
+} = No.buildin;
 const server = libs.tcp.createServer({host: '127.0.0.1', port: 8888});
 server.on('connection', (socket) => {
     socket.on('data', (buffer) => {

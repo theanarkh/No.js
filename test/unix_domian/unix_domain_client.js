@@ -2,7 +2,7 @@ const {
     unix_domain,
     console,
     net,
-} = No;
+} = No.buildin;
 
 // const fds = unix_domain.socketpair(unix_domain.constant.domain.AF_UNIX, unix_domain.constant.type.SOCK_STREAM);
 // console.log(fds);

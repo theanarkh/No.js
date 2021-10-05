@@ -22,6 +22,7 @@
 using namespace v8;
 using namespace No;
 using namespace No::Env;
+using namespace Util;
 
 namespace No {
     namespace Core {

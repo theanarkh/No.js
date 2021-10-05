@@ -2,7 +2,7 @@ const {
     fs,
     console,
     util
-} = No;
+} = No.buildin;
 const fd = fs.openSync('./test/file/1.txt', fs.constant.FLAG.O_RDWR);
 {
     const arr = new ArrayBuffer(100);

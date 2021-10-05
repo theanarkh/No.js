@@ -1,7 +1,7 @@
 
 const {
     inotify,
-} = No;
+} = No.buildin;
 
 const map = {};
 

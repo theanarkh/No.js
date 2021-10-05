@@ -3,7 +3,7 @@ const {
     console,
     net,
     HTTPParser,
-} = No;
+} = No.buildin;
 const { constant } = net;
 class Server extends No.libs.tcp.Server {
     constructor(options = {}, cb) {
@@ -43,7 +43,7 @@ class HTTPRequest extends No.libs.events {
         }
         
         socket.on('data', (buffer) => {
-            this.httpparser.parse(buffer);
+            this.httpparser.parse(buffer.getBuffer());
         });
         socket.on('end', () => {
             this.emit('end');
@@ -52,14 +52,36 @@ class HTTPRequest extends No.libs.events {
 }
 
 class HTTPResponse extends No.libs.events {
+    statusCode = 200;
+    headers = {
+        "Server": "No.js"
+    };
     socket = null;
     constructor({socket, server}) {
         super();
         this.server = server;
         this.socket = socket;
     }
-    write(buffer) {
-        this.socket.write(buffer);
+    buildHeaders(headers) {
+        const arr = [];
+        for (const [k, v] of Object.entries(headers)) {
+            arr.push(`${k}:${v}\r\n`);
+        }
+        return arr.join('');
+    }
+    end(data) {
+        const responseLine = `HTTP/1.1 ${this.statusCode} OK`;
+        const headers = { ...this.headers, "Content-length": Buffer.strlen(data)};
+        const responseHeaders = this.buildHeaders(headers);
+        this.socket.write(`${responseLine}\r\n${responseHeaders}\r\n\r\n${data}\r\n\r\n`);
+    }
+    setHeaders(headers) {
+        for (const [k, v] of Object.entries(headers)) {
+            this.setHeader(k, v);
+        }
+    }
+    setHeader(k, v) {
+        this.headers[k] = v;
     }
 }
 

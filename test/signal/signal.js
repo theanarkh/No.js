@@ -3,7 +3,7 @@ const {
     console,
     process,
     timer,
-} = No;
+} = No.buildin;
 signal.on(signal.constant.SIG.SIGUSR1, () => {
     console.log("135");
 });

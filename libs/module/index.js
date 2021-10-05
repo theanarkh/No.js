@@ -1,6 +1,6 @@
 const {
     loader,
-} = No;
+} = No.buildin;
 
 const map = {};
 class Module {

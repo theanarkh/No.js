@@ -2,9 +2,16 @@ const {
     loader,
     process,
     console,
-} = No;
+} = No.buildin;
 function loaderNativeModule() {
     const modules = [
+        // {
+        //     module: 'libs/console/index.js',
+        //     name: 'console',
+        //     after: (exports) => {
+        //         global.console = exports;
+        //     }
+        // },
         {
             module: 'libs/module/index.js',
             name: 'module'
@@ -13,9 +20,19 @@ function loaderNativeModule() {
             module: 'libs/events/index.js',
             name: 'events'
         },
+        // {
+        //     module: 'libs/process/index.js',
+        //     name: 'process',
+        //     after: (exports) => {
+        //         global.process = exports;
+        //     }
+        // },
         {
             module: 'libs/buffer/index.js',
-            name: 'buffer'
+            name: 'buffer',
+            after: (exports) => {
+                global.Buffer = exports;
+            }
         },
         {
             module: 'libs/inotify/index.js',
@@ -37,6 +54,7 @@ function loaderNativeModule() {
         };
         loader.compile(modules[i].module).call(null, loader.compile, module.exports, module);
         No.libs[modules[i].name] = module.exports;
+        typeof modules[i].after === 'function' && modules[i].after(module.exports);
     }
 }
 

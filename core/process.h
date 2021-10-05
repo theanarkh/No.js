@@ -24,6 +24,7 @@ namespace No {
         void GetEnv(V8_ARGS);
         void Fork(V8_ARGS);
         void Wait(V8_ARGS);
+        void Cwd(V8_ARGS);
         void Execve(V8_ARGS);
         void Exit(V8_ARGS);
         void Init(Isolate* isolate, Local<Object> target);

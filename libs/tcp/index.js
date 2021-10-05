@@ -2,7 +2,7 @@ const {
     tcp,
     console,
     net,
-} = No;
+} = No.buildin;
 const { constant } = net;
 const { events } = No.libs;
 class Server extends events {
@@ -24,6 +24,9 @@ class Server extends events {
 class Socket extends events {
     fd = -1;
     write(buffer) {
+        if (typeof buffer === 'string') {
+            buffer = Buffer.from(buffer).getBuffer();
+        }
         tcp.write(this.fd, buffer);
     }
 }
@@ -43,8 +46,8 @@ class ServerSocket extends Socket {
         this.read();
     }
     read() {
-        const buffer = new ArrayBuffer(1024);
-        tcp.read(this.fd, buffer, 0, (status) => {
+        const buffer = Buffer.alloc(1024);
+        tcp.read(this.fd, buffer.getBuffer(), 0, (status) => {
             if (status === 0) {
                 this.emit('end');
             } else if (status > 0){
