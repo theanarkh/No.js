@@ -14,6 +14,10 @@ function loaderNativeModule() {
             name: 'events'
         },
         {
+            module: 'libs/buffer/index.js',
+            name: 'buffer'
+        },
+        {
             module: 'libs/inotify/index.js',
             name: 'inotify'
         },
