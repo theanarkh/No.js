@@ -3,7 +3,8 @@
 void No::UDP::SendTo(V8_ARGS) {
     V8_ISOLATE
     int fd = args[0].As<Integer>()->Value(); 
-    Local<ArrayBuffer> arrayBuffer = args[1].As<ArrayBuffer>();
+    Local<Uint8Array> uint8Array = args[1].As<Uint8Array>();
+    Local<ArrayBuffer> arrayBuffer = uint8Array->Buffer();
     std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
     int flags = args[2].As<Integer>()->Value(); 
     const struct sockaddr_in * dest_addr_ptr = nullptr;
@@ -27,7 +28,8 @@ void No::UDP::SendTo(V8_ARGS) {
 void No::UDP::RecvFrom(V8_ARGS) {
     V8_ISOLATE
     int fd = args[0].As<Integer>()->Value(); 
-    Local<ArrayBuffer> arrayBuffer = args[1].As<ArrayBuffer>();
+    Local<Uint8Array> uint8Array = args[1].As<Uint8Array>();
+    Local<ArrayBuffer> arrayBuffer = uint8Array->Buffer();
     std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
     int flags = args[2].As<Integer>()->Value(); 
     const struct sockaddr_in * src_addr_ptr = nullptr;

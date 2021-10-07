@@ -25,7 +25,7 @@ class Socket extends events {
     fd = -1;
     write(buffer) {
         if (typeof buffer === 'string') {
-            buffer = Buffer.from(buffer).getBuffer();
+            buffer = Buffer.from(buffer);
         }
         tcp.write(this.fd, buffer);
     }
@@ -47,7 +47,7 @@ class ServerSocket extends Socket {
     }
     read() {
         const buffer = Buffer.alloc(1024);
-        tcp.read(this.fd, buffer.getBuffer(), 0, (status) => {
+        tcp.read(this.fd, buffer, 0, (status) => {
             if (status === 0) {
                 this.emit('end');
             } else if (status > 0){

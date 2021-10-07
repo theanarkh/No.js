@@ -88,25 +88,13 @@ function fromUTF8(bytes) {
     return chars.join('');
 }
 
-class Buffer {
-    bytes = null;
-    memory = null;
+class Buffer extends Uint8Array {
     constructor({ length }) {
-        this.memory = new ArrayBuffer(length);
-        this.bytes = new Uint8Array(this.memory);
-        this.byteLength = length;
+        super(length);
     }
 
     toString(encoding = 'UTF-8') {
-        return fromUTF8(this.bytes);
-    }
-
-    getBuffer() {
-        return this.memory;
-    }
-
-    getBytes() {
-        return this.bytes;
+        return fromUTF8(this);
     }
 
     static strlen(str) {
@@ -117,16 +105,11 @@ class Buffer {
         const chars = toUTF8(str);
         const buffer = new Buffer({length: chars.length});
         for (let i = 0; i < buffer.byteLength; i++) {
-            buffer.bytes[i] = chars[i];
+            buffer[i] = chars[i];
         }
         return buffer;
     }
-    get(index) {
-        return this.bytes && this.bytes[index]
-    }
-    set(index, value) {
-        return this.bytes && (this.bytes[index] = value);
-    }
+
     static toString(bytes) {
         return fromUTF8(bytes);
     }
@@ -141,7 +124,7 @@ class Buffer {
         for (let i = 0; i < arr.length; i++) {
             const buffer = arr[i];
             for (let j = 0; j < buffer.byteLength; j++) {
-                newBuffer.set(index++, buffer.bytes[j]);
+                newBuffer[index++] = buffer[j];
             }
         }
         return newBuffer;

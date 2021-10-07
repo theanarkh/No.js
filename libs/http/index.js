@@ -43,7 +43,7 @@ class HTTPRequest extends No.libs.events {
         }
         
         socket.on('data', (buffer) => {
-            this.httpparser.parse(buffer.getBuffer());
+            this.httpparser.parse(buffer);
         });
         socket.on('end', () => {
             this.emit('end');

@@ -7,7 +7,8 @@ void read_write_request(V8_ARGS, int op) {
     if (args.Length() > 2 && args[2]->IsNumber()) {
         offset = args[2].As<Integer>()->Value();
     }
-    Local<ArrayBuffer> arrayBuffer = args[1].As<ArrayBuffer>();
+    Local<Uint8Array> uint8Array = args[1].As<Uint8Array>();
+    Local<ArrayBuffer> arrayBuffer = uint8Array->Buffer();
     std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
     V8_CONTEXT
     Environment *env = Environment::GetEnvByContext(context);
@@ -87,7 +88,8 @@ void No::IO::Close(V8_ARGS) {
 void No::IO::ReadSync(V8_ARGS) {
     V8_ISOLATE
     int fd = args[0].As<Uint32>()->Value();
-    Local<ArrayBuffer> arrayBuffer = args[1].As<ArrayBuffer>();
+    Local<Uint8Array> uint8Array = args[1].As<Uint8Array>();
+    Local<ArrayBuffer> arrayBuffer = uint8Array->Buffer();
     std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
     Local<Integer> ret = Integer::New(isolate, read(fd, backing->Data(), backing->ByteLength()));
     V8_RETURN(ret);
@@ -96,7 +98,8 @@ void No::IO::ReadSync(V8_ARGS) {
 void No::IO::WriteSync(V8_ARGS) {
     V8_ISOLATE
     int fd = args[0].As<Uint32>()->Value();
-    Local<ArrayBuffer> arrayBuffer = args[1].As<ArrayBuffer>();
+    Local<Uint8Array> uint8Array = args[1].As<Uint8Array>();
+    Local<ArrayBuffer> arrayBuffer = uint8Array->Buffer();
     std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
     Local<Integer> ret = Integer::New(isolate, write(fd, backing->Data(), backing->ByteLength()));
     V8_RETURN(ret);

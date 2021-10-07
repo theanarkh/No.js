@@ -15,7 +15,8 @@ void No::HTTP::Parser::Parse(const char * data, size_t len) {
 
 void No::HTTP::Parser::Parse(const FunctionCallbackInfo<Value>& args) {
     Parser * parser = (Parser *)unwrap(args.This());
-    Local<ArrayBuffer> arrayBuffer = args[0].As<ArrayBuffer>();
+    Local<Uint8Array> uint8Array = args[0].As<Uint8Array>();
+    Local<ArrayBuffer> arrayBuffer = uint8Array->Buffer();
     std::shared_ptr<BackingStore> backing = arrayBuffer->GetBackingStore();
     const char * data = (const char * )backing->Data();
     parser->Parse(data, strlen(data));

@@ -1,11 +1,10 @@
 const {
     console,
-    libs
 } = No.buildin;
-const server = libs.tcp.createServer({host: '127.0.0.1', port: 8888});
+const server = No.libs.tcp.createServer({host: '127.0.0.1', port: 8888});
 server.on('connection', (socket) => {
     socket.on('data', (buffer) => {
-        console.log(new Uint8Array(buffer));
+        console.log(buffer);
     })
 })
 // const { constant } = net;
