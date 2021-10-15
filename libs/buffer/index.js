@@ -91,6 +91,7 @@ function fromUTF8(bytes) {
 class Buffer extends Uint8Array {
     constructor({ length }) {
         super(length);
+        // super(new ArrayBuffer(length));
     }
 
     toString(encoding = 'UTF-8') {
