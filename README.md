@@ -20,5 +20,3 @@ No.js：基于V8和io_uring的JS运行时，只支持Linux5.5及以上  <br/>
 
 四 文章  
 [No.js---基于V8和io_uring的JS运行时](https://zhuanlan.zhihu.com/p/407085340)
-
-<img src="https://github.com/theanarkh/understand-nodejs/blob/master/6871657625761_.pic.jpg" title="Thanks" alt="Thanks" width="300" height="300" align="bottom" />
